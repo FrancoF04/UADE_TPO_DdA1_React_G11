@@ -1,17 +1,24 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SelectRobotScreen from '../screens/SelectRobotScreen';
+import { colors } from '../config/theme';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
     return (
         <Stack.Navigator
-            initialRouteName="#"
+            initialRouteName="SelectRobot"
             screenOptions={{
                 headerStyle: { backgroundColor: colors.primary },
                 headerTintColor: colors.white,
                 headerTitleStyle: { fontWeight: 'bold' },
             }}
         >
+            <Stack.Screen
+                name="SelectRobot"
+                component={SelectRobotScreen}
+                options={{ title: 'Select Your Robot' }}
+            />
         </Stack.Navigator>
     );
 }
