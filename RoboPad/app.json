@@ -3,7 +3,7 @@
     "name": "RoboPad",
     "slug": "RoboPad",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "robopad",
     "userInterfaceStyle": "automatic",
