@@ -5,7 +5,9 @@ import { StyleSheet } from 'react-native';
 export default function RobotButton({ title, image }){
     return (
         <View style={styles.button}>
-            <Image source={image} style={styles.image} />
+            <View style={styles.imageWrapper}>
+                <Image source={image} style={styles.image} />
+            </View>
             <Text style={styles.text}>{title}</Text>
         </View>
     );
@@ -13,8 +15,8 @@ export default function RobotButton({ title, image }){
 
 const styles = StyleSheet.create({
     button: {
-        width: 200,
-        height: 200,
+        flex: 1,
+        height: '80%',
         backgroundColor: colors.surface,
         borderRadius: 16,
         justifyContent: 'center',
@@ -26,10 +28,15 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    image: {
-        width: 100,
-        height: 100,
+    imageWrapper: {
+        height: '70%',
+        aspectRatio: 1,
         marginBottom: 16,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
     },
     text: {
         fontSize: fontSizes.lg,
