@@ -178,10 +178,10 @@ Feature 1 puede navegar hacia ellas con `navigation.navigate('Movement')` / `nav
 
 | Control | Endpoint | Valores |
 |---------|----------|---------|
-| Botón ↑ (hold) | `POST /move` | `vx=0.5, vy=0, vyaw=0` |
-| Botón ↓ (hold) | `POST /move` | `vx=-0.5, vy=0, vyaw=0` |
-| Botón ← (hold) | `POST /move` | `vx=0, vy=0, vyaw=1.0` |
-| Botón → (hold) | `POST /move` | `vx=0, vy=0, vyaw=-1.0` |
+| Botón ↑ (hold) | `POST /move` | `vx=0.1, vy=0, vyaw=0` |
+| Botón ↓ (hold) | `POST /move` | `vx=-0.1, vy=0, vyaw=0` |
+| Botón ← (hold) | `POST /move` | `vx=0, vy=0, vyaw=0.1` |
+| Botón → (hold) | `POST /move` | `vx=0, vy=0, vyaw=-0.1` |
 | Soltar cualquier botón | `POST /stop` | — |
 | STOP | `POST /stop` | — |
 | Pararse | `POST /standup` | — |

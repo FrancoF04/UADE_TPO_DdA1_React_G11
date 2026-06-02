@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRobot } from '@/context/RobotContext';
 import { robotService } from '@/services/robotService';
 import DirButton from '@/components/DirButton/DirButton';
@@ -22,6 +23,17 @@ export default function MovementScreen() {
 
   // Keep ref in sync so interval callbacks always see the latest value
   isConnectedRef.current = isConnected;
+
+  // Detiene el robot al navegar fuera de la pantalla (evita movimiento sin control)
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        clearInterval(moveIntervalRef.current);
+        moveIntervalRef.current = null;
+        if (isConnectedRef.current) robotService.stop().catch(console.error);
+      };
+    }, [])
+  );
 
   const showFeedback = (message, success) => {
     setFeedback({ message, success });
@@ -91,7 +103,7 @@ export default function MovementScreen() {
                 label="↑"
                 subtitle="Adelante"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0.5, 0, 0)}
+                onPressIn={() => startDirectionalMove(0.1, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -100,7 +112,7 @@ export default function MovementScreen() {
                 label="←"
                 subtitle="Girar izq."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, 1.0)}
+                onPressIn={() => startDirectionalMove(0, 0, 0.1)}
                 onPressOut={stopDirectionalMove}
               />
               <View style={styles.dpadCenter}>
@@ -116,7 +128,7 @@ export default function MovementScreen() {
                 label="→"
                 subtitle="Girar der."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, -1.0)}
+                onPressIn={() => startDirectionalMove(0, 0, -0.1)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -125,7 +137,7 @@ export default function MovementScreen() {
                 label="↓"
                 subtitle="Atrás"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(-0.5, 0, 0)}
+                onPressIn={() => startDirectionalMove(-0.1, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
