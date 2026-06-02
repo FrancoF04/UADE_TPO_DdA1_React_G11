@@ -202,6 +202,26 @@ real de Feature 3 puede usarlo tal cual.
 
 ---
 
+### Paso H — Borrar log de debug en `services/api.js`
+
+**Archivo:** `services/api.js`
+
+**Qué hay ahora:** Un interceptor de request que loguea cada llamada HTTP en consola
+(`[API] METHOD url | body: ...`). Se agregó para facilitar el debug durante el desarrollo.
+
+**Qué hacer:** Borrar el bloque del interceptor de request antes de hacer merge a main:
+
+```js
+// Borrar esto:
+api.interceptors.request.use((config) => {
+  const body = config.data ? ` | body: ${JSON.stringify(config.data)}` : '';
+  console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}${body}`);
+  return config;
+});
+```
+
+---
+
 ## Resumen de archivos tocados
 
 | Archivo | Tipo de cambio | Acción al integrar |
@@ -211,5 +231,6 @@ real de Feature 3 puede usarlo tal cual.
 | `context/AuthContext.js` | Nuevo — temporal | Reemplazar con el de Features 5 y 6 |
 | `services/authService.js` | Nuevo — permanente | No tocar (o enriquecer) |
 | `services/actionsService.js` | Nuevo — permanente | No tocar (o enriquecer) |
+| `services/api.js` | Modificado — debug temporal | Borrar interceptor de log antes de merge a main |
 | `navigation/AppNavigator.js` | Modificado | Actualizar imports de pantallas |
 | `App.js` | Modificado | Revisar providers si Feature 1 los renombra |
