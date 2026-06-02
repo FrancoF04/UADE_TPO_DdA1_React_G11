@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SelectRobotScreen from '../screens/SelectRobotScreen';
+import SelectRobotScreen from '../RoboPad/screens/SelectRobotScreen';
 import { colors } from '../config/theme';
 
 const Stack = createNativeStackNavigator();
