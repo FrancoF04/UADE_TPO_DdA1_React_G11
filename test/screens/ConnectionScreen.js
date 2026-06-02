@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useRobot } from '@/context/RobotContext';
+import { useAuth } from '@/context/AuthContext';
 import styles from './ConnectionScreen.styles';
 
 const ROBOT_TYPES = [
@@ -16,6 +17,7 @@ const STATUS_LABELS = {
 
 export default function ConnectionScreen({ navigation }) {
   const { isConnected, robotType, connectionStatus, connect, disconnect } = useRobot();
+  const { logout } = useAuth();
 
   const [selectedType, setSelectedType] = useState('go2');
   const [networkInterface, setNetworkInterface] = useState('eth0');
@@ -140,6 +142,11 @@ export default function ConnectionScreen({ navigation }) {
           disabled={!isConnected}
         >
           <Text style={styles.navBtnText}>Ir a Control de Movimiento →</Text>
+        </TouchableOpacity>
+
+        {/* Cerrar sesión — reemplazar con el botón real de Feature 5 */}
+        <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+          <Text style={styles.logoutBtnText}>Cerrar sesión</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
