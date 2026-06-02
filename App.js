@@ -3,12 +3,17 @@ import { StatusBar } from 'expo-status-bar';
 import AppNavigator from '@/navigation/AppNavigator';
 import { COLORS } from '@/config/colors';
 
-// RobotProvider will be added by the Feature 1 team alongside AuthProvider
+// [TEST] RobotProvider mock — reemplazar con los providers reales de Feature 1
+import { RobotProvider } from '@/context/RobotContext';
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar style="light" backgroundColor={COLORS.bg} />
-      <AppNavigator />
-    </NavigationContainer>
+    // [TEST] Envolver con AuthProvider de Feature 1 cuando esté lista
+    <RobotProvider>
+      <NavigationContainer>
+        <StatusBar style="light" backgroundColor={COLORS.bg} />
+        <AppNavigator />
+      </NavigationContainer>
+    </RobotProvider>
   );
 }
