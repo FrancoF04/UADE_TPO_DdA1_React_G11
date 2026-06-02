@@ -152,12 +152,15 @@ Sin esto, todos los endpoints protegidos fallan.
 ```js
 import { useRobot } from '@/context/RobotContext';
 
-const { isConnected, robotType } = useRobot();
+const { isConnected, robotType, refreshStatus } = useRobot();
 // isConnected: boolean
 // robotType: 'go2' | 'g1' | null
+// refreshStatus(): async — consulta GET /status y actualiza el estado
 ```
 
-Si Feature 1 agrega más valores al contexto, no hay problema — solo no puede quitar esos dos.
+`ConnectionScreen` llama `refreshStatus()` cada vez que entra en foco (`useFocusEffect`) para reflejar el estado real del servidor. Feature 1 **debe** exponer esta función.
+
+Si Feature 1 agrega más valores al contexto, no hay problema — solo no puede quitar esos tres.
 
 ---
 
@@ -189,8 +192,10 @@ Feature 1 puede navegar hacia ellas con `navigation.navigate('Movement')` / `nav
 | Joystick Y | `POST /move` | `vx` proporcional (-1 a 1) |
 | Joystick X | `POST /move` | `vyaw` proporcional (-1 a 1) |
 | Soltar joystick | `POST /stop` | — |
+| Salir de la pantalla | `POST /stop` | via `useFocusEffect` cleanup |
 
 Los botones direccionales envían comandos repetidos cada **150ms** mientras se mantienen presionados (usando `setInterval` + `onPressIn`/`onPressOut`).
+Al navegar fuera de `MovementScreen` (back, otra pantalla) se limpia el intervalo y se manda stop automáticamente — evita que el robot quede moviéndose sin control.
 
 ---
 
