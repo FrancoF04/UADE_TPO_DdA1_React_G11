@@ -136,6 +136,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Claude Code
+.claude/
+
 #Expo original blank template project files
 
 # Expo
