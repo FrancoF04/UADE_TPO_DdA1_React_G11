@@ -162,6 +162,46 @@ enriquecerlo sin necesidad de reescribirlo.
 
 ---
 
+---
+
+## Funcionalidad 3 — Pantalla de Acciones
+
+### Paso E — Borrar pantalla mock de `/test/`
+
+Al borrar `/test/` completo (Paso 1 arriba), también se elimina:
+- `test/screens/ActionsScreen.js` + `ActionsScreen.styles.js`
+
+---
+
+### Paso F — Actualizar `navigation/AppNavigator.js`
+
+**Archivo:** `navigation/AppNavigator.js`
+
+**Qué hay ahora:** Importa `ActionsScreen` desde `@/test/screens/ActionsScreen`.
+
+**Qué hacer:** Reemplazar el import con la pantalla real de Feature 3:
+
+```js
+// Borrar esto:
+import ActionsScreen from '@/test/screens/ActionsScreen';
+
+// Agregar la pantalla real:
+import ActionsScreen from '@/screens/ActionsScreen';
+```
+
+El `Stack.Screen name="Actions"` ya está registrado — no hay que agregar nada más.
+
+---
+
+### Paso G — `services/actionsService.js` (no tocar)
+
+**Archivo:** `services/actionsService.js`
+
+Este archivo **no es mock** — llama a `GET /actions` y `POST /action/{name}`. La implementación
+real de Feature 3 puede usarlo tal cual.
+
+---
+
 ## Resumen de archivos tocados
 
 | Archivo | Tipo de cambio | Acción al integrar |
@@ -170,5 +210,6 @@ enriquecerlo sin necesidad de reescribirlo.
 | `context/RobotContext.js` | Nuevo — temporal | Reemplazar con el de Feature 1 |
 | `context/AuthContext.js` | Nuevo — temporal | Reemplazar con el de Features 5 y 6 |
 | `services/authService.js` | Nuevo — permanente | No tocar (o enriquecer) |
+| `services/actionsService.js` | Nuevo — permanente | No tocar (o enriquecer) |
 | `navigation/AppNavigator.js` | Modificado | Actualizar imports de pantallas |
 | `App.js` | Modificado | Revisar providers si Feature 1 los renombra |

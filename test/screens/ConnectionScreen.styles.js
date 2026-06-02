@@ -176,6 +176,18 @@ export default StyleSheet.create({
     fontWeight: '700',
     fontSize: 15,
   },
+  actionsBtn: {
+    marginTop: 8,
+    backgroundColor: COLORS.accentDark,
+    borderRadius: 10,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  actionsBtnText: {
+    color: COLORS.white,
+    fontWeight: '700',
+    fontSize: 15,
+  },
   logoutBtn: {
     marginTop: 8,
     paddingVertical: 14,

@@ -144,6 +144,15 @@ export default function ConnectionScreen({ navigation }) {
           <Text style={styles.navBtnText}>Ir a Control de Movimiento →</Text>
         </TouchableOpacity>
 
+        {/* Navigate to ActionsScreen */}
+        <TouchableOpacity
+          style={[styles.actionsBtn, !isConnected && styles.navBtnDisabled]}
+          onPress={() => navigation.navigate('Actions')}
+          disabled={!isConnected}
+        >
+          <Text style={styles.actionsBtnText}>Ir a Acciones →</Text>
+        </TouchableOpacity>
+
         {/* Cerrar sesión — reemplazar con el botón real de Feature 5 */}
         <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
           <Text style={styles.logoutBtnText}>Cerrar sesión</Text>

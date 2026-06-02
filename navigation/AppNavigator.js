@@ -4,10 +4,11 @@ import { COLORS } from '@/config/colors';
 import MovementScreen from '@/screens/MovementScreen';
 import { useAuth } from '@/context/AuthContext';
 
-// [TEST] Importar pantallas mock — borrar cuando Features 1, 5 y 6 estén integradas
+// [TEST] Importar pantallas mock — borrar cuando Features 1, 3, 5 y 6 estén integradas
 import ConnectionScreen from '@/test/screens/ConnectionScreen';
 import LoginScreen from '@/test/screens/LoginScreen';
 import RegisterScreen from '@/test/screens/RegisterScreen';
+import ActionsScreen from '@/test/screens/ActionsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +59,12 @@ export default function AppNavigator() {
             name="Movement"
             component={MovementScreen}
             options={{ title: 'Control de Movimiento' }}
+          />
+          {/* [TEST] ActionsScreen mock de Feature 3 — reemplazar con la pantalla real */}
+          <Stack.Screen
+            name="Actions"
+            component={ActionsScreen}
+            options={{ title: 'Acciones' }}
           />
         </>
       )}
