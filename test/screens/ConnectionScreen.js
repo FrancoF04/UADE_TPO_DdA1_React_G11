@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRobot } from '@/context/RobotContext';
 import { useAuth } from '@/context/AuthContext';
 import styles from './ConnectionScreen.styles';
@@ -16,8 +17,15 @@ const STATUS_LABELS = {
 };
 
 export default function ConnectionScreen({ navigation }) {
-  const { isConnected, robotType, connectionStatus, connect, disconnect } = useRobot();
+  const { isConnected, robotType, connectionStatus, connect, disconnect, refreshStatus } = useRobot();
   const { logout } = useAuth();
+
+  // Consulta /status al entrar a la pantalla para reflejar el estado real del servidor
+  useFocusEffect(
+    useCallback(() => {
+      refreshStatus();
+    }, [refreshStatus])
+  );
 
   const [selectedType, setSelectedType] = useState('go2');
   const [networkInterface, setNetworkInterface] = useState('eth0');

@@ -20,20 +20,22 @@ Aplicación móvil en React Native (Expo 54) para controlar robots Unitree (Go2 
 |---|---------------|--------|------|
 | 1 | Pantalla de Conexión (connect/disconnect, status) | ⏳ Pendiente (otro dev) | — |
 | 2 | Pantalla de Control de Movimiento | ✅ Implementada | `feature/second-feature-connection` |
-| 3 | Pantalla de Acciones | ⏳ Pendiente | — |
+| 3 | Pantalla de Acciones | 🧪 Mock en `/test/` | `feature/second-feature-connection` |
 | 4 | Estado global de conexión (header) | ⏳ Pendiente | — |
-| 5 | Login | ⏳ Pendiente | — |
-| 6 | Registro | ⏳ Pendiente | — |
+| 5 | Login | 🧪 Mock en `/test/` | `feature/second-feature-connection` |
+| 6 | Registro | 🧪 Mock en `/test/` | `feature/second-feature-connection` |
 | 7 | Historial de comandos (server-side) | ⏳ Pendiente | — |
 
-Para probar la Funcionalidad 2 mientras la 1 no está lista, existe un **mock en `/test/`**. Ver sección "Setup de testing" más abajo.
+Los mocks de Features 3, 5 y 6 son **funcionales** (conectan al backend real) pero mínimos en UI.
+Se implementaron para desbloquear el flujo completo mientras los devs responsables construyen las versiones definitivas.
+Para integrar cada feature cuando esté lista: seguir `test/CLEANUP.md`.
 
 ---
 
 ## Mapa de archivos implementados
 
 ```
-App.js                          ← Entry point. Envuelve con RobotProvider [TEST] y NavigationContainer
+App.js                          ← Entry point. Envuelve con AuthProvider [TEST] > RobotProvider [TEST] > NavigationContainer
 index.js                        ← Registra App con Expo (no tocar)
 jsconfig.json                   ← Habilita alias @/ para imports absolutos
 
@@ -44,10 +46,15 @@ config/
 services/
   api.js                        ← Instancia de Axios con baseURL y timeout (8s)
   robotService.js               ← getStatus, move, stop, standup, sitdown
+  authService.js                ← login (POST /auth/token), register (POST /auth/register)
+  actionsService.js             ← getActions (GET /actions), executeAction (POST /action/{name})
 
 context/
   RobotContext.js               ← [TEST/TEMPORAL] Provee isConnected, robotType, connect, disconnect, refreshStatus
                                    Será reemplazado por la implementación real de Funcionalidad 1
+  AuthContext.js                ← [TEST/TEMPORAL] Provee isAuthenticated, isLoading, login, logout
+                                   SecureStore para persistir JWT. Interceptors Axios (Bearer + 401→logout).
+                                   Será reemplazado por la implementación real de Features 5 y 6
 
 components/
   DirButton/                    ← Botón direccional con soporte hold (onPressIn/onPressOut)
@@ -61,30 +68,45 @@ screens/
   MovementScreen.styles.js
 
 navigation/
-  AppNavigator.js               ← Stack Navigator. [TEST] arranca en ConnectionScreen mock
+  AppNavigator.js               ← Stack Navigator con routing condicional:
+                                   !isAuthenticated → Login / Register (mocks)
+                                   isAuthenticated  → Connection (mock) / Movement / Actions (mock)
 
-test/                           ← TODO DESCARTABLE — borrar al integrar Feature 1
-  CLEANUP.md                    ← Guía paso a paso de qué tocar al integrar Feature 1
+test/                           ← TODO DESCARTABLE — borrar al integrar Features 1, 3, 5 y 6
+  CLEANUP.md                    ← Guía paso a paso de integración para Features 1, 3, 5 y 6
   screens/
-    ConnectionScreen.js         ← UI mock mínima de Feature 1
+    ConnectionScreen.js         ← UI mock mínima de Feature 1 (incluye botones a Movement y Actions)
     ConnectionScreen.styles.js
+    LoginScreen.js              ← UI mock mínima de Feature 5
+    LoginScreen.styles.js
+    RegisterScreen.js           ← UI mock mínima de Feature 6
+    RegisterScreen.styles.js
+    ActionsScreen.js            ← UI mock mínima de Feature 3 (grilla + historial local)
+    ActionsScreen.styles.js
 ```
 
 ---
 
 ## Setup de testing (estado actual)
 
-La app arranca en `ConnectionScreen` (mock de Feature 1). El flujo es:
+La app arranca en `LoginScreen` (mock de Feature 5). El flujo completo es:
 
-1. Seleccionar tipo de robot (Go2 / G1)
-2. Confirmar interfaz de red (default `eth0`)
-3. Presionar "Conectar" → llama a `POST /connect` en el backend real
-4. Si conecta OK → se habilita "Ir a Control de Movimiento"
-5. En `MovementScreen` se pueden usar todos los controles de Feature 2
+1. **Login** — ingresar email/usuario y contraseña → llama a `POST /auth/token`
+   - Sin cuenta: tocar "Registrate" → ir a RegisterScreen
+2. **Register** — ingresar username, email, contraseña y confirmación → llama a `POST /auth/register` → vuelve a Login
+3. Una vez autenticado, la app navega automáticamente a `ConnectionScreen` (mock de Feature 1)
+4. **Connection** — seleccionar robot (Go2 / G1), confirmar interfaz de red (`eth0`), presionar "Conectar" → `POST /connect`
+5. Si conecta OK → se habilitan los botones de navegación:
+   - "Ir a Control de Movimiento" → `MovementScreen` (Feature 2)
+   - "Ir a Acciones" → `ActionsScreen` (mock de Feature 3)
+6. **ActionsScreen** — carga `GET /actions` al conectar, muestra grilla de botones. Cada botón llama a `POST /action/{nombre}`. Historial local con timestamps por sesión.
 
-Si el robot no está conectado, `MovementScreen` sigue siendo accesible pero los botones quedan deshabilitados (opacity 0.35) y aparece un banner de advertencia amarillo.
+El JWT se persiste en `SecureStore`: si el usuario cierra y reabre la app, salta directo a Connection.
+El botón "Cerrar sesión" está al fondo de `ConnectionScreen`.
 
-**Para integrar Feature 1 cuando esté lista:** seguir `test/CLEANUP.md`.
+Si el robot no está conectado, `MovementScreen` y `ActionsScreen` siguen siendo accesibles pero los controles quedan deshabilitados (opacity 0.35).
+
+**Para integrar cada feature cuando esté lista:** seguir `test/CLEANUP.md`.
 
 ---
 
@@ -101,9 +123,31 @@ Ver `.env.example` para referencia. `config/constants.js` las combina en `API_BA
 
 ---
 
+## Contrato de AuthContext
+
+`AppNavigator` depende de `useAuth()`. La implementación real de Features 5 y 6 **debe** respetar este contrato mínimo:
+
+```js
+import { useAuth } from '@/context/AuthContext';
+
+const { isAuthenticated, isLoading, login, logout } = useAuth();
+// isAuthenticated: boolean
+// isLoading: boolean  — true mientras se restaura la sesión desde SecureStore al arrancar
+// login(identifier, password): async, lanza excepción en error
+// logout(): async
+```
+
+`AppNavigator` usa `isAuthenticated` e `isLoading` para el routing condicional.
+La implementación real **debe mantener los interceptors de Axios**:
+- Request: agrega `Authorization: Bearer <token>` en cada llamada.
+- Response: llama `logout()` ante un `401`.
+Sin esto, todos los endpoints protegidos fallan.
+
+---
+
 ## Contrato de RobotContext
 
-`MovementScreen` depende de `useRobot()`. La implementación de Feature 1 **debe** respetar este contrato mínimo:
+`MovementScreen` y `ActionsScreen` dependen de `useRobot()`. La implementación de Feature 1 **debe** respetar este contrato mínimo:
 
 ```js
 import { useRobot } from '@/context/RobotContext';
@@ -117,15 +161,16 @@ Si Feature 1 agrega más valores al contexto, no hay problema — solo no puede 
 
 ---
 
-## Contrato de MovementScreen con el navegador
+## Contrato de pantallas con el navegador
 
-`MovementScreen` espera estar registrada con el nombre `'Movement'` en el Stack Navigator:
+Las pantallas están registradas con estos nombres en el Stack Navigator — no cambiarlos:
 
 ```js
 <Stack.Screen name="Movement" component={MovementScreen} />
+<Stack.Screen name="Actions"  component={ActionsScreen}  />
 ```
 
-Feature 1 puede navegar hacia ella con `navigation.navigate('Movement')`.
+Feature 1 puede navegar hacia ellas con `navigation.navigate('Movement')` / `navigation.navigate('Actions')`.
 
 ---
 
@@ -159,18 +204,20 @@ Los botones direccionales envían comandos repetidos cada **150ms** mientras se 
 - **pnpm** — gestor de paquetes (nunca usar npm/yarn)
 
 Librerías instaladas no usadas aún (disponibles para Features futuras):
-- `expo-secure-store` — tokens JWT (Feature 5 Login)
 - `@react-native-async-storage/async-storage` — preferencias
-- `expo-local-authentication` — biometría
-- `@react-navigation/bottom-tabs` — no instalado aún, podría hacer falta para Features 3-7
+- `expo-local-authentication` — biometría (Feature 5 podría usarla)
+- `@react-navigation/bottom-tabs` — no instalado aún, podría hacer falta para Features 4-7
+
+Ya en uso:
+- `expo-secure-store` — persiste el JWT en `AuthContext` bajo la clave `'auth_token'`
 
 ---
 
 ## Decisiones de diseño tomadas
 
 - **Tema oscuro** — paleta en `config/colors.js` (bg `#0d1117`, card `#161b22`, accent `#2188ff`)
-- **Un contexto por dominio** — `RobotContext` para robot, `AuthContext` lo hará Feature 1
-- **Servicios separados por dominio** — `robotService` solo tiene endpoints de Feature 2; connect/disconnect pertenecen a Feature 1 (están en `RobotContext` temporalmente)
+- **Un contexto por dominio** — `RobotContext` para robot, `AuthContext` para sesión (ambos temporales)
+- **Servicios separados por dominio** — `robotService` (Feature 2), `authService` (Features 5/6), `actionsService` (Feature 3). connect/disconnect pertenecen a Feature 1 (están en `RobotContext` temporalmente)
 - **StyleSheet en archivo propio** — cada componente/pantalla tiene su `.styles.js`
 - **Imports con `@/`** — nunca rutas relativas (`../../`)
 - **Commits convencionales en español** — `feat:`, `fix:`, `chore:`, `docs:`, `test:` + primera letra mayúscula + punto final
