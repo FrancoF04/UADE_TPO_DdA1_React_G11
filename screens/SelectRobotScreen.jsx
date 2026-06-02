@@ -5,8 +5,8 @@ import RobotButton from '../components/RobotButton';
 export default function SelectRobotScreen() {
     return (
         <View style={styles.container}>
-            <RobotButton title="G1" image={require('../assets/images/G1.png')}/>
             <RobotButton title="Go2" image={require('../assets/images/GO2.png')}/>
+            <RobotButton title="G1" image={require('../assets/images/G1.png')}/>
         </View>
     );
 }
@@ -14,7 +14,7 @@ export default function SelectRobotScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.background,
