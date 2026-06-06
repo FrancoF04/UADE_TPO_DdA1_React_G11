@@ -1,17 +1,18 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
-import { StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useRobot } from '../hooks/useRobot';
 
 export default function RobotButton({ title, image}) {
-    const handlePress = (title) => {
-
+    const navigation = useNavigation();
+    const { selectRobot } = useRobot();
+    const handlePress = () => {
+        selectRobot({ name: title });
+        navigation.navigate('Status');
     }
     
     return (
-        <TouchableOpacity 
-            style={styles.button}
-            activeOpacity={0.8}
-            onPress={() => console.log(`Selected robot: ${title}`)}>
+        <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={handlePress}>
             <View style={styles.imageWrapper}>
                 <Image source={image} style={styles.image} />
             </View>

@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SelectRobotScreen from '../screens/SelectRobotScreen';
+import StatusScreen from '../screens/StatusScreen';
 import { colors } from '../config/theme';
 
 const Stack = createNativeStackNavigator();
@@ -18,6 +19,12 @@ export default function AppNavigator() {
                 name="SelectRobot"
                 component={SelectRobotScreen}
                 options={{ title: 'Select Your Robot' }}
+            />
+
+            <Stack.Screen
+                name="Status"
+                component={StatusScreen}
+                options={{ title: 'Robot Status' }}
             />
         </Stack.Navigator>
     );
