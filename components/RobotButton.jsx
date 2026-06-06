@@ -1,15 +1,22 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
 import { StyleSheet } from 'react-native';
 
-export default function RobotButton({ title, image }){
+export default function RobotButton({ title, image}) {
+    const handlePress = (title) => {
+
+    }
+    
     return (
-        <View style={styles.button}>
+        <TouchableOpacity 
+            style={styles.button}
+            activeOpacity={0.8}
+            onPress={() => console.log(`Selected robot: ${title}`)}>
             <View style={styles.imageWrapper}>
                 <Image source={image} style={styles.image} />
             </View>
             <Text style={styles.text}>{title}</Text>
-        </View>
+        </TouchableOpacity>
     );
 }
 
