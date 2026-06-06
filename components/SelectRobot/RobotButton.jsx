@@ -1,13 +1,13 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../config/theme';
+import { colors, fontSizes } from '../../config/theme';
 import { useNavigation } from '@react-navigation/native';
-import { useRobot } from '../hooks/useRobot';
+import { useRobot } from '../../hooks/useRobot';
 
-export default function RobotButton({ title, image}) {
+export default function RobotButton({ title, image }) {
     const navigation = useNavigation();
     const { selectRobot } = useRobot();
     const handlePress = () => {
-        selectRobot({ name: title });
+        selectRobot({ name: title.toLowerCase() });
         navigation.navigate('Status');
     }
     

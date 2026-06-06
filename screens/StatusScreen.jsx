@@ -1,12 +1,19 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
 import { useRobot } from '../hooks/useRobot';
+import InterfazDeRed from '../components/Status/InterfazDeRed';
+import ConectionButton from '../components/Status/ConectionButton';
+import ConectionStatus from '../components/Status/ConectionStatus';
 
 export default function StatusScreen() {
-    const { robot } = useRobot();
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Status Screen - {robot.name}</Text>
+            <View style={styles.statusContainer}>
+                <ConectionStatus />
+                <InterfazDeRed />
+            </View>
+            
+            <ConectionButton />
         </View>
     );
 }
@@ -15,9 +22,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: colors.background,
+    },
+    statusContainer: {
+        marginTop: 25,
+        marginBottom: 15,
+        width: '90%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     title: {
         fontSize: fontSizes.xl,

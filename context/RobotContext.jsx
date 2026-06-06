@@ -5,7 +5,8 @@ export const RobotContext = createContext();
 export const RobotProvider = ({ children }) => {
     const [robot, setRobotData] = useState({
         name: null,
-        isConnected: "Disconnected",
+        isConnected: null,
+        NetworkInterface: null,
     });
     
     const selectRobot = (componentData) => {
@@ -16,16 +17,31 @@ export const RobotProvider = ({ children }) => {
         }));
     }
 
-    const disconnectRobot = () => {
+    const connectRobot = () => {
+        setRobotData(prev => ({
+            ...prev,
+            isConnected: "Connecting",
+        }));
+        
+        // LLAMADA A LA API PARA CONECTAR EL ROBOT
 
+        setRobotData(prev => ({
+            ...prev,
+            isConnected: "Connected",
+            NetworkInterface: "eth0"
+        }));
+    }
+
+    const disconnectRobot = () => {
         setRobotData({
             name: null,
             isConnected: "Disconnected",
+            NetworkInterface: null,
         });
     }
 
     return (
-        <RobotContext.Provider value={{ robot, selectRobot, disconnectRobot }}>
+        <RobotContext.Provider value={{ robot, selectRobot, connectRobot, disconnectRobot }}>
             {children}
         </RobotContext.Provider>
     );

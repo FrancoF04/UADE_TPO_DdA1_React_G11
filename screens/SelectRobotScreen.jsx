@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
-import RobotButton from '../components/RobotButton';
+import RobotButton from '../components/SelectRobot/RobotButton';
 
 export default function SelectRobotScreen() {
     return (
