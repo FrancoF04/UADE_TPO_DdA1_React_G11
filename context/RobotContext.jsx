@@ -17,6 +17,14 @@ export const RobotProvider = ({ children }) => {
         }));
     }
 
+    const deselectRobot = () => {
+        setRobotData({
+            name: null,
+            isConnected: null,
+            NetworkInterface: null,
+        });
+    }
+
     const connectRobot = () => {
         setRobotData(prev => ({
             ...prev,
@@ -33,15 +41,15 @@ export const RobotProvider = ({ children }) => {
     }
 
     const disconnectRobot = () => {
-        setRobotData({
-            name: null,
+        setRobotData(prev => ({
+            ...prev,
             isConnected: "Disconnected",
             NetworkInterface: null,
-        });
+        }));
     }
 
     return (
-        <RobotContext.Provider value={{ robot, selectRobot, connectRobot, disconnectRobot }}>
+        <RobotContext.Provider value={{ robot, selectRobot, deselectRobot,connectRobot, disconnectRobot }}>
             {children}
         </RobotContext.Provider>
     );

@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
 import RobotButton from '../components/SelectRobot/RobotButton';
+import { useImage } from '../hooks/useImage';
 
 export default function SelectRobotScreen() {
     return (
         <View style={styles.container}>
-            <RobotButton title="Go2" image={require('../assets/images/GO2.png')}/>
-            <RobotButton title="G1" image={require('../assets/images/G1.png')}/>
+            <RobotButton title="Go2" image={useImage('Go2')}/>
+            <RobotButton title="G1" image={useImage('G1')}/>
         </View>
     );
 }

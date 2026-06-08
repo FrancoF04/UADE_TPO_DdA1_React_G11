@@ -7,11 +7,14 @@ export default function DepurationOptions() {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-        <View>
+        <View style={styles.container}>
             <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+    },
 });

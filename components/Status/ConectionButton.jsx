@@ -36,7 +36,7 @@ export default function ConectionButton() {
 
 const styles = StyleSheet.create({
     button: {
-        width: '90%',
+        width: '100%',
         height: 50,
         backgroundColor: colors.connect,
         borderRadius: 10,

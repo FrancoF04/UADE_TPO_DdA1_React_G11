@@ -1,8 +1,8 @@
 import { TouchableOpacity } from "react-native";
 import { Text, StyleSheet } from "react-native";
-import { colors } from "../../config/theme";
+import { colors, fontSizes } from "../../config/theme";
 
-export default function DepurationOptionsButton(setDepurationOptionsVisible) {
+export default function DepurationOptionsButton({ setDepurationOptionsVisible }) {
     const handlePress = () => {
         setDepurationOptionsVisible(prev => !prev);
     }
@@ -11,7 +11,7 @@ export default function DepurationOptionsButton(setDepurationOptionsVisible) {
         <TouchableOpacity 
             style={styles.button}
             activeOpacity={0.8}
-            onPress={() =>{}}>
+            onPress={handlePress}>
                 <Text style={styles.text}>DEPURATION OPTIONS</Text>
         </TouchableOpacity>
     )
@@ -19,9 +19,9 @@ export default function DepurationOptionsButton(setDepurationOptionsVisible) {
 
 const styles = StyleSheet.create({
     button: {
-        width: '90%',
+        width: '100%',
         height: 50,
-        backgroundColor: colors.ghost,
+        backgroundColor: colors.surface,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
@@ -31,5 +31,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
+    },
+    text: {
+        fontSize: fontSizes.lg,
+        color: colors.text,
+        fontWeight: 'bold',
     },
 })

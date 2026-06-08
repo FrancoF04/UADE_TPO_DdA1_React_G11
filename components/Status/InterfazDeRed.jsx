@@ -7,19 +7,19 @@ export default function InterfazDeRed() {
     const network = robot.NetworkInterface;
     
     const mensaje = network && network !== 'Connecting' && network !== 'Disconnected'
-        ? `Interfaz de Red: ${network}`
-        : 'No detectado';
+        ? network
+        : 'No detectada';
 
     return (
-        <Text style={styles.title}>{mensaje}</Text>
+        <Text style={styles.value}>{mensaje}</Text>
     );
 }
 
 const styles = StyleSheet.create({
-    title: {
+    value: {
         fontSize: fontSizes.lg,
         color: colors.text,
-        textAlign: 'right',
+        textAlign: 'left',
         flexShrink: 1,
     },
 });
