@@ -1,31 +1,19 @@
 import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import { colors, fontSizes } from '../../config/theme';
-import { webSocketService } from '../../services/webSocketService';
 import { useRobot } from '../../hooks/useRobot'; // 1. Importar el hook
 
 export default function DepurationOptions() {
     const { robot } = useRobot(); // 2. Obtener el estado del robot
-    const [depurationData, setDepurationData] = useState(JSON.stringify({}, null, 2));
+    const [depurationData, setDepurationData] = useState(JSON.stringify({ status: "Depuration active" }, null, 2));
 
     useEffect(() => {
-        // 3. Solo suscribirse si el robot está conectado
+        // 3. Solo mostrar informativo si el robot no está conectado
         if (robot.isConnected !== 'Connected') {
             setDepurationData(JSON.stringify({ status: "Waiting for connection..." }, null, 2));
-            return;
+        } else {
+            setDepurationData(JSON.stringify({ status: "Connected - Telemetry via HTTP fallback pending" }, null, 2));
         }
-
-        const unsubscribe = webSocketService.subscribe((data) => {
-            if (data) {
-                setDepurationData(JSON.stringify(data, null, 2));
-            }
-        });
-
-        return () => {
-            unsubscribe();
-            // Opcional: limpiar datos al desmontar o desconectar
-            setDepurationData(JSON.stringify({}, null, 2));
-        };
     }, [robot.isConnected]); // 4. El efecto ahora depende del estado de conexión
 
     return (

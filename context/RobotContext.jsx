@@ -1,6 +1,5 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState } from 'react';
 import { conectionService } from '../services/conectionService';
-import { webSocketService } from '../services/webSocketService';
 
 export const RobotContext = createContext();
 
@@ -10,22 +9,6 @@ export const RobotProvider = ({ children }) => {
         isConnected: null,
         NetworkInterface: null,
     });
-
-    useEffect(() => {
-        // Manejo reactivo de la conexión WebSocket basado en el estado del robot
-        if (robot.isConnected === 'Connected') {
-            webSocketService.connect();
-        } else if (robot.isConnected === 'Disconnected') {
-            webSocketService.disconnect();
-        }
-
-        return () => {
-            // Asegurar desconexión si el provider se desmonta
-            if (robot.isConnected === 'Connected') {
-                webSocketService.disconnect();
-            }
-        };
-    }, [robot.isConnected]);
     
     const selectRobot = (componentData) => {
         setRobotData(prev => ({
