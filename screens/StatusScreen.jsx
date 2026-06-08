@@ -1,14 +1,17 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
+import { useState } from 'react';
 import { useRobot } from '../hooks/useRobot';
 import { useImage } from '../hooks/useImage';
 import InterfazDeRed from '../components/Status/InterfazDeRed';
 import ConectionButton from '../components/Status/ConectionButton';
 import ConectionStatus from '../components/Status/ConectionStatus';
-import DeporationOptions from '../components/Status/DepurationOptions';
+import DepurationOptionsButton from '../components/Status/DepurationOptionsButton';
+import DepurationOptions from '../components/Status/DepurationOptions';
 
 export default function StatusScreen() {
     const { robot } = useRobot();
+    const [isVisible, setIsVisible] = useState(false);
     
     return (
         <View style={styles.container}>
@@ -35,9 +38,13 @@ export default function StatusScreen() {
                 />
             </View>
 
+            
+            {isVisible && <DepurationOptions />}
+            
+
             <View style={styles.actionsContainer}>
                 <ConectionButton />
-                <DeporationOptions />
+                <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />
             </View>
         </View>
     );
@@ -98,6 +105,10 @@ const styles = StyleSheet.create({
         width: '40%',
         height: 120,
         resizeMode: 'contain',
+    },
+    depurationContainer: {
+        flex: 1,
+        marginBottom: 20,
     },
     actionsContainer: {
         width: '100%',
