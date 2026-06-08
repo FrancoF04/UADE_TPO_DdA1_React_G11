@@ -1,20 +1,24 @@
 import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import { colors, fontSizes } from '../../config/theme';
-import { useRobot } from '../../hooks/useRobot'; // 1. Importar el hook
+import { useRobot } from '../../hooks/useRobot';
+import { conectionService } from '../../services/conectionService';
 
 export default function DepurationOptions() {
-    const { robot } = useRobot(); // 2. Obtener el estado del robot
-    const [depurationData, setDepurationData] = useState(JSON.stringify({ status: "Depuration active" }, null, 2));
+    const { robot } = useRobot();
+    const [depurationData, setDepurationData] = useState(JSON.stringify('loading', null, 2));
 
     useEffect(() => {
-        // 3. Solo mostrar informativo si el robot no está conectado
-        if (robot.isConnected !== 'Connected') {
-            setDepurationData(JSON.stringify({ status: "Waiting for connection..." }, null, 2));
-        } else {
-            setDepurationData(JSON.stringify({ status: "Connected - Telemetry via HTTP fallback pending" }, null, 2));
-        }
-    }, [robot.isConnected]); // 4. El efecto ahora depende del estado de conexión
+        const fetchData = async () => {
+            if (robot.isConnected === 'Connected') {
+                const data = await conectionService.status();
+                setDepurationData(JSON.stringify(data.data, null, 2));
+            } else {
+                setDepurationData(JSON.stringify('No robot connected', null, 2));
+            }
+        };
+        fetchData();
+    }, [robot.isConnected]); 
 
     return (
         <View style={styles.container}>

@@ -34,11 +34,12 @@ export const RobotProvider = ({ children }) => {
         
         try {
             await conectionService.connect(robot.name);
+            const status = await conectionService.status();
 
             setRobotData(prev => ({
                 ...prev,
                 isConnected: "Connected",
-                NetworkInterface: "eth0"
+                NetworkInterface: status.data.NetworkInterface || null,
             }));
         } catch (error) {
             console.warn('[RobotContext] Mock server no disponible o error HTTP:', error.message || error);
