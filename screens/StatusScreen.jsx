@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { useRobot } from '../hooks/useRobot';
 import { useImage } from '../hooks/useImage';
 import InterfazDeRed from '../components/Status/InterfazDeRed';
@@ -12,6 +13,22 @@ import DepurationOptions from '../components/Status/DepurationOptions';
 export default function StatusScreen() {
     const { robot } = useRobot();
     const [isVisible, setIsVisible] = useState(false);
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerBackVisible: robot.isConnected !== 'Connected',
+            gestureEnabled: robot.isConnected !== 'Connected',
+        });
+
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            if (robot.isConnected === 'Connected') {
+                e.preventDefault();
+            }
+        });
+
+        return unsubscribe;
+    }, [navigation, robot.isConnected]);
     
     return (
         <View style={styles.container}>
@@ -37,14 +54,12 @@ export default function StatusScreen() {
                     style={styles.images}
                 />
             </View>
-
             
-            {isVisible && <DepurationOptions />}
+            {isVisible && robot.isConnected==='Connected' && <DepurationOptions />}
             
-
             <View style={styles.actionsContainer}>
+                {robot.isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
                 <ConectionButton />
-                <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />
             </View>
         </View>
     );

@@ -1,15 +1,38 @@
-import { StyleSheet,  View, ScrollView, Text } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { useState, useEffect } from 'react';
 import { colors, fontSizes } from '../../config/theme';
-import DepurationOptionsButton from './DepurationOptionsButton';
+import { webSocketService } from '../../services/webSocketService';
+import { useRobot } from '../../hooks/useRobot'; // 1. Importar el hook
 
 export default function DepurationOptions() {
-    const [DepurationOptions, setDepurationOptions] = useState('{"mode": "standing",\n"fsm_id": 200,\n"balance_mode": 0,\n"stand_height": 4294967295,\n"swing_height": 0.08,\n"body_height": 0.75,\n"position": { "x": 0.0, "y": 0.0, "z": 0.0 },\n"velocity": { "vx": 0.0, "vy": 0.0, "vyaw": 0.0 },\n"body_attitude": { "roll": 0.0, "pitch": 0.0, "yaw": 0.0 },\n"imu": {\n    "quaternion": [1.0, 0.0, 0.0, 0.0],\n    "gyroscope": [0.0, 0.0, 0.0],\n    "accelerometer": [0.01, -0.02, 9.81],\n    "rpy": [0.0, 0.0, 0.0],\n    "temperature": 38\n  },\n  "error_code": 0,\n  "battery": 92.0\n}');
+    const { robot } = useRobot(); // 2. Obtener el estado del robot
+    const [depurationData, setDepurationData] = useState(JSON.stringify({}, null, 2));
+
+    useEffect(() => {
+        // 3. Solo suscribirse si el robot está conectado
+        if (robot.isConnected !== 'Connected') {
+            setDepurationData(JSON.stringify({ status: "Waiting for connection..." }, null, 2));
+            return;
+        }
+
+        const unsubscribe = webSocketService.subscribe((data) => {
+            if (data) {
+                setDepurationData(JSON.stringify(data, null, 2));
+            }
+        });
+
+        return () => {
+            unsubscribe();
+            // Opcional: limpiar datos al desmontar o desconectar
+            setDepurationData(JSON.stringify({}, null, 2));
+        };
+    }, [robot.isConnected]); // 4. El efecto ahora depende del estado de conexión
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>DEPURATION OPTIONS</Text>
-            <ScrollView>
-                <Text style={styles.text}>{DepurationOptions}</Text>
+            <ScrollView showsVerticalScrollIndicator={true}>
+                <Text style={styles.text}>{depurationData}</Text>
             </ScrollView>
         </View>
     );
