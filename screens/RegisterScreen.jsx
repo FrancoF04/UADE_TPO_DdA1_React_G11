@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   StyleSheet,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { register } from '../services/authService';
 import { colors, spacing, fontSizes } from '../config/theme';
@@ -19,6 +18,7 @@ export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async () => {
@@ -43,9 +43,8 @@ export default function RegisterScreen({ navigation }) {
     setSubmitting(true);
     try {
       await register(fields);
-      Alert.alert('Registro exitoso', 'Tu cuenta fue creada. Ya podés iniciar sesión.', [
-        { text: 'Iniciar sesión', onPress: () => navigation.goBack() },
-      ]);
+      setSuccess('Tu cuenta fue creada. Ya podés iniciar sesión.');
+      setTimeout(() => navigation.goBack(), 1200);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -72,6 +71,7 @@ export default function RegisterScreen({ navigation }) {
       </TouchableOpacity>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {success ? <Text style={styles.success}>{success}</Text> : null}
 
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.link}>¿Ya tenés cuenta? Iniciá sesión</Text>
@@ -120,6 +120,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: colors.primaryDark,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
+  success: {
+    color: colors.success,
     textAlign: 'center',
     marginTop: spacing.md,
   },

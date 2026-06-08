@@ -1,58 +1,48 @@
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getTokenExpiry } from './token';
 
+// SecureStore no existe en web, ahi caemos a AsyncStorage (localStorage)
+const isWeb = Platform.OS === 'web';
+const secureSet = (k, v) => (isWeb ? AsyncStorage.setItem(k, v) : SecureStore.setItemAsync(k, v));
+const secureGet = (k) => (isWeb ? AsyncStorage.getItem(k) : SecureStore.getItemAsync(k));
+const secureDelete = (k) => (isWeb ? AsyncStorage.removeItem(k) : SecureStore.deleteItemAsync(k));
+
 const ACCESS_TOKEN = 'auth_token';
-const REFRESH_TOKEN = 'refresh_token';
 const ACCESS_EXPIRES_AT = 'access_expires_at';
-const REFRESH_EXPIRES_AT = 'refresh_expires_at';
 const USERNAME = 'auth_username';
 const BIOMETRIC_ENABLED = 'biometric_enabled';
 const BIOMETRIC_DISMISSED = 'biometric_opt_in_dismissed';
 
 const DEFAULT_ACCESS_TTL_MS = 60 * 60 * 1000;
-const DEFAULT_REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-export async function saveSession({ accessToken, refreshToken, username }) {
+export async function saveSession({ accessToken, username }) {
   const now = Date.now();
   const accessExpiresAt = getTokenExpiry(accessToken) ?? now + DEFAULT_ACCESS_TTL_MS;
-  const refreshExpiresAt = getTokenExpiry(refreshToken) ?? now + DEFAULT_REFRESH_TTL_MS;
 
-  await SecureStore.setItemAsync(ACCESS_TOKEN, accessToken);
-  await SecureStore.setItemAsync(REFRESH_TOKEN, refreshToken ?? accessToken);
-  await SecureStore.setItemAsync(ACCESS_EXPIRES_AT, String(accessExpiresAt));
-  await SecureStore.setItemAsync(REFRESH_EXPIRES_AT, String(refreshExpiresAt));
-  if (username != null) await SecureStore.setItemAsync(USERNAME, username);
+  await secureSet(ACCESS_TOKEN, accessToken);
+  await secureSet(ACCESS_EXPIRES_AT, String(accessExpiresAt));
+  if (username != null) await secureSet(USERNAME, username);
 }
 
 export async function getAccessToken() {
-  return SecureStore.getItemAsync(ACCESS_TOKEN);
-}
-
-export async function getRefreshToken() {
-  return SecureStore.getItemAsync(REFRESH_TOKEN);
+  return secureGet(ACCESS_TOKEN);
 }
 
 export async function getStoredUsername() {
-  return SecureStore.getItemAsync(USERNAME);
+  return secureGet(USERNAME);
 }
 
 export async function getAccessExpiresAt() {
-  const raw = await SecureStore.getItemAsync(ACCESS_EXPIRES_AT);
-  return raw ? Number(raw) : null;
-}
-
-export async function getRefreshExpiresAt() {
-  const raw = await SecureStore.getItemAsync(REFRESH_EXPIRES_AT);
+  const raw = await secureGet(ACCESS_EXPIRES_AT);
   return raw ? Number(raw) : null;
 }
 
 export async function clearSession() {
-  await SecureStore.deleteItemAsync(ACCESS_TOKEN);
-  await SecureStore.deleteItemAsync(REFRESH_TOKEN);
-  await SecureStore.deleteItemAsync(ACCESS_EXPIRES_AT);
-  await SecureStore.deleteItemAsync(REFRESH_EXPIRES_AT);
-  await SecureStore.deleteItemAsync(USERNAME);
+  await secureDelete(ACCESS_TOKEN);
+  await secureDelete(ACCESS_EXPIRES_AT);
+  await secureDelete(USERNAME);
 }
 
 export async function isBiometricEnabled() {

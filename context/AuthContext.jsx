@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { login as loginRequest } from '../services/authService';
-import { setupInterceptors, refreshSession } from '../services/api';
+import { setupInterceptors } from '../services/api';
 import { decodeToken } from '../utils/token';
 import { isBiometricAvailable, promptBiometric } from '../utils/biometrics';
 import {
@@ -8,7 +8,6 @@ import {
   clearSession,
   getAccessToken,
   getAccessExpiresAt,
-  getRefreshExpiresAt,
   getStoredUsername,
   isBiometricEnabled,
   setBiometricEnabled,
@@ -26,6 +25,7 @@ function buildUser(token, username) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // hay sesion guardada valida pero falta pasar la huella para entrar
   const [pendingBiometric, setPendingBiometric] = useState(false);
 
   const logout = async () => {
@@ -45,17 +45,14 @@ export function AuthProvider({ children }) {
     const restore = async () => {
       const token = await getAccessToken();
       const accessExpiresAt = await getAccessExpiresAt();
+      const valid = token && accessExpiresAt && Date.now() < accessExpiresAt;
 
-      if (token && accessExpiresAt && Date.now() < accessExpiresAt) {
-        setUser(buildUser(token, await getStoredUsername()));
-        setLoading(false);
-        return;
-      }
-
-      const refreshExpiresAt = await getRefreshExpiresAt();
-      const refreshValid = refreshExpiresAt && Date.now() < refreshExpiresAt;
-      if (refreshValid && (await isBiometricEnabled()) && (await isBiometricAvailable())) {
-        setPendingBiometric(true);
+      if (valid) {
+        if ((await isBiometricEnabled()) && (await isBiometricAvailable())) {
+          setPendingBiometric(true);
+        } else {
+          setUser(buildUser(token, await getStoredUsername()));
+        }
       }
       setLoading(false);
     };
@@ -63,8 +60,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (username, password) => {
-    const { accessToken, refreshToken } = await loginRequest(username, password);
-    await saveSession({ accessToken, refreshToken, username });
+    const { accessToken } = await loginRequest(username, password);
+    await saveSession({ accessToken, username });
     setUser(buildUser(accessToken, username));
     setPendingBiometric(false);
   };
@@ -72,12 +69,6 @@ export function AuthProvider({ children }) {
   const loginWithBiometric = async () => {
     const ok = await promptBiometric();
     if (!ok) return false;
-
-    const refreshed = await refreshSession();
-    if (!refreshed) {
-      setPendingBiometric(false);
-      return false;
-    }
 
     const token = await getAccessToken();
     setUser(buildUser(token, await getStoredUsername()));

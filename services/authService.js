@@ -10,10 +10,7 @@ export async function login(username, password) {
   try {
     const { data } = await api.post('/auth/login', { username, password });
     const payload = data?.data ?? {};
-    return {
-      accessToken: payload.accessToken ?? payload.token,
-      refreshToken: payload.refreshToken ?? payload.accessToken ?? payload.token,
-    };
+    return { accessToken: payload.accessToken ?? payload.token };
   } catch (error) {
     throw new Error(extractError(error, 'Ocurrió un error. Intentá de nuevo.'));
   }
