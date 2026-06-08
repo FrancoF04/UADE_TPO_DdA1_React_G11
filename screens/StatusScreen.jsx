@@ -4,16 +4,19 @@ import { useRobot } from '../hooks/useRobot';
 import InterfazDeRed from '../components/Status/InterfazDeRed';
 import ConectionButton from '../components/Status/ConectionButton';
 import ConectionStatus from '../components/Status/ConectionStatus';
+import DeporationOptions from '../components/Status/DepurationOptions';
 
 export default function StatusScreen() {
     return (
         <View style={styles.container}>
-            <View style={styles.statusContainer}>
-                <ConectionStatus />
-                <InterfazDeRed />
+            <View>
+                <View style={styles.statusContainer}>
+                    <ConectionStatus />
+                    <InterfazDeRed />
+                </View>
+                <ConectionButton />
             </View>
-            
-            <ConectionButton />
+            <DeporationOptions />
         </View>
     );
 }
