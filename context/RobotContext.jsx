@@ -183,6 +183,20 @@ export const RobotProvider = ({ children }) => {
         return () => clearHeartbeatTimer();
     }, [isConnected, attemptReconnect, clearHeartbeatTimer]);
 
+    useEffect(() => {
+        const checkInitialStatus = async () => {
+            try {
+                const response = await conectionService.status();
+                setConnectedState(response.data.NetworkInterface, response.data);
+            } catch (error) {
+                console.warn('[RobotContext] init status errored:', error.message || error);
+                setErrorState();
+            }
+        };
+        
+        checkInitialStatus();
+    }, [setConnectedState, setErrorState]);
+
     const value = useMemo(() => ({
         name,
         isConnected,
