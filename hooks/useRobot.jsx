@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { RobotContext } from '../context/RobotContext';
+import { RobotContext } from '@/context/RobotContext';
 
 export const useRobot = () => {
     const context = useContext(RobotContext);

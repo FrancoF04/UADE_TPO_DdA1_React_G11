@@ -1,38 +1,40 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SelectRobotScreen from '../screens/SelectRobotScreen';
-import StatusScreen from '../screens/StatusScreen';
-import ConectionStatus from '../components/Status/ConectionStatus';
-import { colors } from '../config/theme';
+import { COLORS } from '@/config/colors';
+import SelectRobotScreen from '@/screens/SelectRobotScreen';
+import StatusScreen from '@/screens/StatusScreen';
+import MovementScreen from '@/screens/MovementScreen';
+import ConectionStatus from '@/components/Status/ConectionStatus';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-    return (
-        <Stack.Navigator
-            initialRouteName="SelectRobot"
-            screenOptions={{
-                headerStyle: { backgroundColor: colors.primary },
-                headerTintColor: colors.white,
-                headerTitleStyle: { fontWeight: 'bold' },
-                headerRight: () => <ConectionStatus />,
-                headerRightContainerStyle: { marginRight: 10 },
-            }}
-        >
-            <Stack.Screen
-                name="SelectRobot"
-                component={SelectRobotScreen}
-                options={{ title: 'Select Your Robot' }}
-            />
-
-            <Stack.Screen
-                name="Status"
-                component={StatusScreen}
-                options={{ title: 'Robot Status' }}
-            />
-        </Stack.Navigator>
-    );
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return (
+    <Stack.Navigator
+      initialRouteName="SelectRobot"
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.card },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: COLORS.bg },
+        headerRight: () => <ConectionStatus />,
+        headerRightContainerStyle: { marginRight: 10 },
+      }}
+    >
+      <Stack.Screen
+        name="SelectRobot"
+        component={SelectRobotScreen}
+        options={{ title: 'Seleccionar Robot' }}
+      />
+      <Stack.Screen
+        name="Status"
+        component={StatusScreen}
+        options={{ title: 'Estado del Robot' }}
+      />
+      <Stack.Screen
+        name="Movement"
+        component={MovementScreen}
+        options={{ title: 'Control de Movimiento' }}
+      />
+    </Stack.Navigator>
+  );
 }
