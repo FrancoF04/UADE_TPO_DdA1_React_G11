@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { colors, fontSizes } from '../config/theme';
 import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -62,6 +62,15 @@ export default function StatusScreen() {
             <View style={styles.actionsContainer}>
                 {isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
                 <ConectionButton />
+                {isConnected==='Connected' && (
+                    <TouchableOpacity
+                        style={styles.controlButton}
+                        activeOpacity={0.8}
+                        onPress={() => navigation.navigate('Movement')}
+                    >
+                        <Text style={styles.controlButtonText}>Controlar robot</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
@@ -132,5 +141,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 'auto',
         marginBottom: 40,
+    },
+    controlButton: {
+        width: '100%',
+        height: 50,
+        backgroundColor: colors.primary,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 12,
+    },
+    controlButtonText: {
+        fontSize: fontSizes.lg,
+        color: colors.white,
+        fontWeight: 'bold',
     },
 });
