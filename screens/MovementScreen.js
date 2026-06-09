@@ -103,7 +103,7 @@ export default function MovementScreen() {
                 label="↑"
                 subtitle="Adelante"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0.1, 0, 0)}
+                onPressIn={() => startDirectionalMove(0.3, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -112,7 +112,7 @@ export default function MovementScreen() {
                 label="←"
                 subtitle="Girar izq."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, 0.1)}
+                onPressIn={() => startDirectionalMove(0, 0, 0.3)}
                 onPressOut={stopDirectionalMove}
               />
               <View style={styles.dpadCenter}>
@@ -128,7 +128,7 @@ export default function MovementScreen() {
                 label="→"
                 subtitle="Girar der."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, -0.1)}
+                onPressIn={() => startDirectionalMove(0, 0, -0.3)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -137,7 +137,7 @@ export default function MovementScreen() {
                 label="↓"
                 subtitle="Atrás"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(-0.1, 0, 0)}
+                onPressIn={() => startDirectionalMove(-0.3, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
