@@ -25,7 +25,6 @@ export default function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName="SelectRobot"
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.card },
         headerTintColor: COLORS.text,
@@ -73,19 +72,7 @@ export default function AppNavigator() {
           <Stack.Screen
             name="Movement"
             component={MovementScreen}
-            options={({ navigation }) => ({
-              title: 'Control de Movimiento',
-              headerRight: () => (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <TouchableOpacity onPress={() => navigation.navigate('Actions')}>
-                    <Text style={{ color: COLORS.accent, fontWeight: '600', fontSize: 14 }}>
-                      Acciones
-                    </Text>
-                  </TouchableOpacity>
-                  <ConectionStatus />
-                </View>
-              ),
-            })}
+            options={{ title: 'Control de Movimiento' }}
           />
           <Stack.Screen
             name="Actions"

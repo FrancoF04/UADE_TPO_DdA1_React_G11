@@ -61,16 +61,25 @@ export default function StatusScreen() {
             
             <View style={styles.actionsContainer}>
                 {isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
-                <ConectionButton />
                 {isConnected==='Connected' && (
                     <TouchableOpacity
                         style={styles.controlButton}
                         activeOpacity={0.8}
                         onPress={() => navigation.navigate('Movement')}
                     >
-                        <Text style={styles.controlButtonText}>Controlar robot</Text>
+                        <Text style={styles.controlButtonText}>Mover Robot</Text>
                     </TouchableOpacity>
                 )}
+                {isConnected==='Connected' && (
+                    <TouchableOpacity
+                        style={[styles.controlButton, styles.actionsButton]}
+                        activeOpacity={0.8}
+                        onPress={() => navigation.navigate('Actions')}
+                    >
+                        <Text style={styles.controlButtonText}>Acciones</Text>
+                    </TouchableOpacity>
+                )}
+                <ConectionButton />
             </View>
         </View>
     );
@@ -150,6 +159,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 12,
+    },
+    actionsButton: {
+        backgroundColor: colors.primaryDark,
     },
     controlButtonText: {
         fontSize: fontSizes.lg,
