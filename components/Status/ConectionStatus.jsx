@@ -3,8 +3,8 @@ import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function ConectionStatus() {
-    const { robot, reconnectAttempts } = useRobot();
-    const status = robot.isConnected;
+    const { isConnected, reconnectAttempts } = useRobot();
+    const status = isConnected;
 
     const statusColors = {
         'Connected': colors.connect,

@@ -8,14 +8,14 @@ const RECONNECT_DELAY = 3000;    // ms: espera entre intentos de reconexión
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 export const RobotProvider = ({ children }) => {
-    const [robot, setRobotData] = useState({
-        name: null,
-        isConnected: null,
-        NetworkInterface: null,
-    });
-
+    // estados del context
+    const [name, setName] = useState(null);
+    const [isConnected, setIsConnected] = useState(null);
+    const [networkInterface, setNetworkInterface] = useState(null);
     const [statusData, setStatusData] = useState(null);
     const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
+    // estado combinado para facilitar uso en componentes
     const reconnectTimerRef = useRef(null);
     const heartbeatTimerRef = useRef(null);
     const isReconnectingRef = useRef(false);
@@ -45,12 +45,10 @@ export const RobotProvider = ({ children }) => {
         }
     }, []);
 
-    const selectRobot = useCallback((componentData) => {
-        setRobotData(prev => ({
-            ...prev,
-            ...componentData,
-            isConnected: "Disconnected",
-        }));
+    const selectRobot = useCallback((robot) => {
+        setName(robot.name);
+        setIsConnected("Disconnected");
+        setNetworkInterface(null);
     }, []);
 
     const deselectRobot = useCallback(() => {
@@ -59,39 +57,28 @@ export const RobotProvider = ({ children }) => {
         isReconnectingRef.current = false;
         setReconnectAttempts(0);
         setStatusData(null);
-        setRobotData({
-            name: null,
-            isConnected: null,
-            NetworkInterface: null,
-        });
+        setName(null);
+        setIsConnected(null);
+        setNetworkInterface(null);
     }, [clearHeartbeatTimer, clearReconnectTimer]);
 
     const setConnectedState = useCallback((networkInterface, newStatusData) => {
         isReconnectingRef.current = false;
         setReconnectAttempts(0);
-        setRobotData(prev => ({
-            ...prev,
-            isConnected: "Connected",
-            NetworkInterface: networkInterface || null,
-        }));
+        setIsConnected("Connected");
+        setNetworkInterface(networkInterface || null);
         setStatusData(newStatusData || null);
     }, []);
 
     const setErrorState = useCallback(() => {
         isReconnectingRef.current = false;
-        setRobotData(prev => ({
-            ...prev,
-            isConnected: "Error",
-            NetworkInterface: null,
-        }));
+        setIsConnected("Error");
+        setNetworkInterface(null);
     }, []);
 
     const setReconnectingState = useCallback(() => {
         isReconnectingRef.current = true;
-        setRobotData(prev => ({
-            ...prev,
-            isConnected: "Reconnecting",
-        }));
+        setIsConnected("Reconnecting");
     }, []);
 
     const attemptReconnect = useCallback(async () => {
@@ -123,10 +110,7 @@ export const RobotProvider = ({ children }) => {
         setReconnectAttempts(0);
         isReconnectingRef.current = false;
 
-        setRobotData(prev => ({
-            ...prev,
-            isConnected: "Connecting",
-        }));
+        setIsConnected("Connecting");
 
         try {
             await conectionService.connect(robotNameRef.current);
@@ -147,11 +131,8 @@ export const RobotProvider = ({ children }) => {
 
         try {
             await conectionService.disconnect();
-            setRobotData(prev => ({
-                ...prev,
-                isConnected: "Disconnected",
-                NetworkInterface: null,
-            }));
+            setIsConnected("Disconnected");
+            networkInterface(null);
         } catch (error) {
             console.warn('[RobotContext] Error al desconectar desde la API:', error.message || error);
         }
@@ -203,14 +184,16 @@ export const RobotProvider = ({ children }) => {
     }, [robot.isConnected, attemptReconnect, clearHeartbeatTimer]);
 
     const value = useMemo(() => ({
-        robot,
+        name,
+        isConnected,
+        networkInterface,
         statusData,
         reconnectAttempts,
         selectRobot,
         deselectRobot,
         connectRobot,
         disconnectRobot,
-    }), [robot, statusData, selectRobot, deselectRobot, connectRobot, disconnectRobot]);
+    }), [name, isConnected, networkInterface, statusData, networkInterface, selectRobot, deselectRobot, connectRobot, disconnectRobot]);
 
     return (
         <RobotContext.Provider value={value}>

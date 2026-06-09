@@ -3,8 +3,8 @@ import { Text, StyleSheet } from 'react-native';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function InterfazDeRed() {
-    const { robot } = useRobot();
-    const network = robot.NetworkInterface;
+    const { NetworkInterface } = useRobot();
+    const network = NetworkInterface;
     
     const mensaje = network && network !== 'Connecting' && network !== 'Disconnected'
         ? network

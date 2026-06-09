@@ -3,9 +3,9 @@ import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function DepurationOptions() {
-    const { robot, statusData } = useRobot();
+    const { isConnected, statusData } = useRobot();
 
-    const depurationData = robot.isConnected === 'Connected' && statusData
+    const depurationData = isConnected === 'Connected' && statusData
         ? JSON.stringify(statusData, null, 2)
         : JSON.stringify('No robot connected', null, 2);
 

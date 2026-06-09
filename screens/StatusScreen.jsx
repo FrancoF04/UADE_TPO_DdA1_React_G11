@@ -11,11 +11,11 @@ import DepurationOptionsButton from '../components/Status/DepurationOptionsButto
 import DepurationOptions from '../components/Status/DepurationOptions';
 
 export default function StatusScreen() {
-    const { robot } = useRobot();
+    const { name, isConnected } = useRobot();
     const [isVisible, setIsVisible] = useState(false);
     const navigation = useNavigation();
 
-    const isLocked = robot.isConnected === 'Connected' || robot.isConnected === 'Reconnecting';
+    const isLocked = isConnected === 'Connected' || isConnected === 'Reconnecting';
 
     useEffect(() => {
         navigation.setOptions({
@@ -35,7 +35,7 @@ export default function StatusScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.robotTitle}>{robot.name?.toUpperCase() || 'ROBOT'}</Text>
+                <Text style={styles.robotTitle}>{name?.toUpperCase() || 'ROBOT'}</Text>
                 <View style={styles.separator} />
             </View>
 
@@ -52,15 +52,15 @@ export default function StatusScreen() {
                     </View>
                 </View>
                 <Image 
-                    source={useImage(robot.name)} 
+                    source={useImage(name)} 
                     style={styles.images}
                 />
             </View>
             
-            {isVisible && robot.isConnected==='Connected' && <DepurationOptions />}
+            {isVisible && isConnected==='Connected' && <DepurationOptions />}
             
             <View style={styles.actionsContainer}>
-                {robot.isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
+                {isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
                 <ConectionButton />
             </View>
         </View>

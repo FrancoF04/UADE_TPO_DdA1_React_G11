@@ -3,8 +3,8 @@ import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function ConectionButton() {
-    const { robot, connectRobot, disconnectRobot } = useRobot();
-    const status = robot.isConnected;
+    const { isConnected, connectRobot, disconnectRobot } = useRobot();
+    const status = isConnected;
 
     const buttonConfig = {
         'Connected': { label: 'DISCONNECT', color: colors.disconnect },
