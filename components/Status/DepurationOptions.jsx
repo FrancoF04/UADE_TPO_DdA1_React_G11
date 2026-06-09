@@ -1,46 +1,13 @@
 import { StyleSheet, View, ScrollView, Text } from 'react-native';
-import { useState, useEffect } from 'react';
 import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
-import { conectionService } from '../../services/conectionService';
-
-const POLLING_INTERVAL = 5000; // ms
 
 export default function DepurationOptions() {
-    const { robot } = useRobot();
-    const [depurationData, setDepurationData] = useState(JSON.stringify('loading', null, 2));
+    const { robot, statusData } = useRobot();
 
-    useEffect(() => {
-        let isMounted = true;
-        let intervalId;
-
-        if (robot.isConnected !== 'Connected') {
-            setDepurationData(JSON.stringify('No robot connected', null, 2));
-            return;
-        }
-
-        const fetchData = async () => {
-            try {
-                const data = await conectionService.status();
-                if (isMounted) {
-                    setDepurationData(JSON.stringify(data.data, null, 2));
-                }
-            } catch (error) {
-                if (isMounted) {
-                    setDepurationData(JSON.stringify({ error: error.message }, null, 2));
-                }
-            }
-        };
-
-        // Fetch inicial + polling cada POLLING_INTERVAL
-        fetchData();
-        intervalId = setInterval(fetchData, POLLING_INTERVAL);
-
-        return () => {
-            isMounted = false;
-            clearInterval(intervalId);
-        };
-    }, [robot.isConnected]); 
+    const depurationData = robot.isConnected === 'Connected' && statusData
+        ? JSON.stringify(statusData, null, 2)
+        : JSON.stringify('No robot connected', null, 2);
 
     return (
         <View style={styles.container}>

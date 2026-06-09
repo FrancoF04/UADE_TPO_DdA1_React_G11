@@ -15,20 +15,22 @@ export default function StatusScreen() {
     const [isVisible, setIsVisible] = useState(false);
     const navigation = useNavigation();
 
+    const isLocked = robot.isConnected === 'Connected' || robot.isConnected === 'Reconnecting';
+
     useEffect(() => {
         navigation.setOptions({
-            headerBackVisible: robot.isConnected !== 'Connected',
-            gestureEnabled: robot.isConnected !== 'Connected',
+            headerBackVisible: !isLocked,
+            gestureEnabled: !isLocked,
         });
 
         const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-            if (robot.isConnected === 'Connected') {
+            if (isLocked) {
                 e.preventDefault();
             }
         });
 
         return unsubscribe;
-    }, [navigation, robot.isConnected]);
+    }, [navigation, isLocked]);
     
     return (
         <View style={styles.container}>

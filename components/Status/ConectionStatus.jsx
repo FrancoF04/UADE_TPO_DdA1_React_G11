@@ -3,22 +3,27 @@ import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function ConectionStatus() {
-    const { robot } = useRobot();
+    const { robot, reconnectAttempts } = useRobot();
     const status = robot.isConnected;
 
     const statusColors = {
         'Connected': colors.connect,
         'Connecting': colors.warning,
+        'Reconnecting': colors.warning,
         'Error': colors.error,
         'Disconnected': colors.disconnect,
     };
 
     const backgroundColor = statusColors[status] || colors.white;
 
+    const displayText = status === 'Reconnecting'
+        ? `Reconnecting (${reconnectAttempts})`
+        : status;
+
     return (
         <View style={styles.container}>
             <View style={[styles.statusIndicator, { backgroundColor }]} />
-            <Text style={styles.statusText}>{status}</Text>
+            <Text style={styles.statusText}>{displayText}</Text>
         </View>
     );
 }
