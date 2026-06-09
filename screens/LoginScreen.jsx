@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Text,
   TextInput,
@@ -6,18 +6,43 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { COLORS } from '@/config/colors';
 import styles from './LoginScreen.styles';
 
 export default function LoginScreen({ navigation }) {
-  const { login } = useAuth();
+  const {
+    login,
+    pendingBiometric,
+    loginWithBiometric,
+    shouldOfferBiometric,
+    enableBiometric,
+    dismissBiometricOptIn,
+  } = useAuth();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // si hay sesion guardada con huella habilitada, pedimos la huella directo
+  useEffect(() => {
+    if (pendingBiometric) loginWithBiometric();
+  }, [pendingBiometric]);
+
+  const offerBiometricOptIn = async () => {
+    if (!(await shouldOfferBiometric())) return;
+    Alert.alert(
+      '¿Activar ingreso con huella?',
+      'La próxima vez vas a poder entrar con tu huella en lugar de escribir la contraseña.',
+      [
+        { text: 'Ahora no', style: 'cancel', onPress: dismissBiometricOptIn },
+        { text: 'Activar', onPress: enableBiometric },
+      ]
+    );
+  };
 
   const handleLogin = async () => {
     if (!identifier.trim() || !password) {
@@ -28,6 +53,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       await login(identifier.trim(), password);
+      await offerBiometricOptIn();
       // la navegación la maneja AppNavigator al cambiar isAuthenticated
     } catch (e) {
       if (e.response?.status === 401) {

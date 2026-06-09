@@ -9,6 +9,8 @@ const secureGet = (k) => (isWeb ? AsyncStorage.getItem(k) : SecureStore.getItemA
 const secureDelete = (k) => (isWeb ? AsyncStorage.removeItem(k) : SecureStore.deleteItemAsync(k));
 
 const ACCESS_TOKEN = 'auth_token';
+const BIOMETRIC_ENABLED = 'biometric_enabled';
+const BIOMETRIC_DISMISSED = 'biometric_opt_in_dismissed';
 
 export async function saveSession(accessToken) {
   await secureSet(ACCESS_TOKEN, accessToken);
@@ -20,4 +22,20 @@ export async function getAccessToken() {
 
 export async function clearSession() {
   await secureDelete(ACCESS_TOKEN);
+}
+
+export async function isBiometricEnabled() {
+  return (await AsyncStorage.getItem(BIOMETRIC_ENABLED)) === 'true';
+}
+
+export async function setBiometricEnabled(enabled) {
+  await AsyncStorage.setItem(BIOMETRIC_ENABLED, enabled ? 'true' : 'false');
+}
+
+export async function isBiometricDismissed() {
+  return (await AsyncStorage.getItem(BIOMETRIC_DISMISSED)) === 'true';
+}
+
+export async function setBiometricDismissed(dismissed) {
+  await AsyncStorage.setItem(BIOMETRIC_DISMISSED, dismissed ? 'true' : 'false');
 }
