@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SelectRobotScreen from '../screens/SelectRobotScreen';
 import StatusScreen from '../screens/StatusScreen';
+import ConnectionStatus from '../components/Status/ConectionStatus';
 import { colors } from '../config/theme';
 
 const Stack = createNativeStackNavigator();
@@ -13,6 +14,8 @@ export default function AppNavigator() {
                 headerStyle: { backgroundColor: colors.primary },
                 headerTintColor: colors.white,
                 headerTitleStyle: { fontWeight: 'bold' },
+                headerRight: () => <ConnectionStatus />,
+                headerRightContainerStyle: { marginRight: 10 },
             }}
         >
             <Stack.Screen
