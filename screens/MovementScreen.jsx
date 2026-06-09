@@ -16,7 +16,8 @@ const ROBOT_LABELS = {
 };
 
 export default function MovementScreen() {
-  const { isConnected, robotType } = useRobot();
+  const { isConnected: connectionStatus, robotType } = useRobot();
+  const isConnected = connectionStatus === 'Connected';
   const [feedback, setFeedback] = useState({ message: null, success: false });
   const moveIntervalRef = useRef(null);
   const isConnectedRef = useRef(isConnected);
