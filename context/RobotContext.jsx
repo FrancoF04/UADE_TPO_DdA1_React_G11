@@ -28,8 +28,8 @@ export const RobotProvider = ({ children }) => {
     }, [reconnectAttempts]);
 
     useEffect(() => {
-        robotNameRef.current = robot.name;
-    }, [robot.name]);
+        robotNameRef.current = name;
+    }, [name]);
 
     const clearReconnectTimer = useCallback(() => {
         if (reconnectTimerRef.current) {
@@ -148,7 +148,7 @@ export const RobotProvider = ({ children }) => {
 
     // Heartbeat: detecta pérdida de conexión cuando está Connected
     useEffect(() => {
-        if (robot.isConnected !== "Connected") {
+        if (isConnected !== "Connected") {
             clearHeartbeatTimer();
             return;
         }
@@ -181,7 +181,7 @@ export const RobotProvider = ({ children }) => {
         heartbeatTimerRef.current = setInterval(checkStatus, HEARTBEAT_INTERVAL);
 
         return () => clearHeartbeatTimer();
-    }, [robot.isConnected, attemptReconnect, clearHeartbeatTimer]);
+    }, [isConnected, attemptReconnect, clearHeartbeatTimer]);
 
     const value = useMemo(() => ({
         name,
