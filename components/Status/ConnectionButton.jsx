@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity } from 'react-native';
+import { COLORS } from '@/config/colors';
 import styles from './ConnectionButton.styles';
 import { useRobot } from '../../hooks/useRobot';
 
@@ -7,9 +8,9 @@ export default function ConnectionButton() {
     const status = isConnected;
 
     const buttonConfig = {
-        'Connected': { label: 'DISCONNECT', color: colors.disconnect },
-        'Connecting': { label: 'CONNECTING...', color: colors.connecting },
-        'Disconnected': { label: 'CONNECT', color: colors.connect },
+        'Connected': { label: 'DISCONNECT', color: COLORS.red },
+        'Connecting': { label: 'CONNECTING...', color: COLORS.yellow },
+        'Disconnected': { label: 'CONNECT', color: COLORS.green },
     };
 
     const { label, color } = buttonConfig[status] || buttonConfig['Disconnected'];

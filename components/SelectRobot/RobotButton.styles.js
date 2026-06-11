@@ -1,25 +1,21 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../../config/theme';
+import { COLORS, RADIUS, PAD, SHADOW, TEXT } from '@/config/styles';
 
 export default StyleSheet.create({
     button: {
         flex: 1,
         height: '80%',
-        backgroundColor: colors.surface,
-        borderRadius: 16,
+        backgroundColor: COLORS.card,
+        borderRadius: RADIUS.xl,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 16,
-        shadowColor: colors.text,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 5,
+        margin: PAD.lg,
+        ...SHADOW,
     },
     imageWrapper: {
         height: '70%',
         aspectRatio: 1,
-        marginBottom: 16,
+        marginBottom: PAD.lg,
     },
     image: {
         width: '100%',
@@ -27,8 +23,7 @@ export default StyleSheet.create({
         resizeMode: 'contain',
     },
     text: {
-        fontSize: fontSizes.lg,
-        color: colors.text,
-        fontWeight: 'bold',
+        ...TEXT.title,
+        fontSize: 20,
     },
 });

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../../config/theme';
+import { COLORS, PAD } from '@/config/styles';
 
 export default StyleSheet.create({
     container: {
@@ -10,11 +10,11 @@ export default StyleSheet.create({
         width: 12,
         height: 12,
         borderRadius: 30,
-        marginRight: 8,
+        marginRight: PAD.sm,
     },
     statusText: {
-        fontSize: fontSizes.lg,
-        color: colors.text,
+        fontSize: 20,
+        color: COLORS.text,
         flexShrink: 1,
     },
 });

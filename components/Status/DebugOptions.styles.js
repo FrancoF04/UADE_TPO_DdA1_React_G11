@@ -1,29 +1,19 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../../config/theme';
+import { COLORS, CARD, TEXT, PAD } from '@/config/styles';
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.surface,
         width: '100%',
-        padding: 20,
-        borderRadius: 15,
-        marginBottom: 10,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        ...CARD,
+        marginBottom: PAD.sm + 2,
     },
     text: {
-        fontSize: fontSizes.sm,
-        color: colors.text,
+        fontSize: 13,
+        color: COLORS.text,
     },
     label: {
-        fontSize: fontSizes.sm,
-        color: colors.textSecondary,
-        fontWeight: 'bold',
-        marginBottom: 4,
-        letterSpacing: 1,
+        ...TEXT.label,
+        fontSize: 13,
     },
 });

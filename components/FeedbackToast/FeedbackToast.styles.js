@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/config/colors';
+import { COLORS, RADIUS, PAD } from '@/config/styles';
 
 export default StyleSheet.create({
   container: {
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+    borderRadius: RADIUS.sm,
+    padding: PAD.sm + 2,
+    marginBottom: PAD.md,
   },
   success: {
     backgroundColor: '#0f2d1a',

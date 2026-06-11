@@ -1,4 +1,5 @@
 import { Text, View } from 'react-native';
+import { COLORS } from '@/config/colors';
 import styles from './ConnectionStatus.styles';
 import { useRobot } from '../../hooks/useRobot';
 
@@ -7,14 +8,14 @@ export default function ConnectionStatus() {
     const status = isConnected;
 
     const statusColors = {
-        'Connected': colors.connect,
-        'Connecting': colors.warning,
-        'Reconnecting': colors.warning,
-        'Error': colors.error,
-        'Disconnected': colors.disconnect,
+        'Connected': COLORS.green,
+        'Connecting': COLORS.yellow,
+        'Reconnecting': COLORS.yellow,
+        'Error': COLORS.red,
+        'Disconnected': COLORS.red,
     };
 
-    const backgroundColor = statusColors[status] || colors.white;
+    const backgroundColor = statusColors[status] || COLORS.white;
 
     const displayText = status === 'Reconnecting'
         ? `Reconnecting (${reconnectAttempts})`

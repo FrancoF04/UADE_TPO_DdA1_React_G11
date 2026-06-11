@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/config/colors';
+import { COLORS, CARD, BUTTON, TEXT, PAD } from '@/config/styles';
 
 export default StyleSheet.create({
   safe: {
@@ -7,8 +7,8 @@ export default StyleSheet.create({
     backgroundColor: COLORS.bg,
   },
   container: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: PAD.lg,
+    paddingBottom: PAD.xl + PAD.lg,
   },
 
   // Header
@@ -16,26 +16,23 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: PAD.md,
   },
   headerLeft: {
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    ...TEXT.title,
   },
   robotLabel: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 2,
+    ...TEXT.subtitle,
+    marginTop: PAD.xs / 2,
   },
   statusDot: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    marginLeft: 12,
+    marginLeft: PAD.lg - 4,
   },
   statusConnected: {
     backgroundColor: COLORS.green,
@@ -46,29 +43,23 @@ export default StyleSheet.create({
 
   // Section
   section: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    ...CARD,
+    marginBottom: PAD.md,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 14,
+    ...TEXT.sectionTitle,
+    marginBottom: PAD.lg - 2,
   },
 
   // D-Pad
   dpad: {
     alignItems: 'center',
-    gap: 6,
+    gap: PAD.xs - 2,
   },
   dpadRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: PAD.xs - 2,
   },
   dpadCenter: {
     width: 72,
@@ -79,15 +70,10 @@ export default StyleSheet.create({
   stopBtn: {
     width: 72,
     height: 72,
-    backgroundColor: '#3a0000',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.red,
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...BUTTON.danger,
   },
   stopBtnDisabled: {
-    opacity: 0.35,
+    ...BUTTON.disabled,
   },
   stopBtnText: {
     fontSize: 13,
@@ -100,6 +86,6 @@ export default StyleSheet.create({
   // Posture
   postureRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: PAD.md,
   },
 });

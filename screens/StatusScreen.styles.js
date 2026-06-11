@@ -1,56 +1,44 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../config/theme';
+import { COLORS, CARD, BUTTON, TEXT, PAD, SHADOW } from '@/config/styles';
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
-        paddingHorizontal: 20,
+        backgroundColor: COLORS.bg,
+        paddingHorizontal: PAD.xl,
     },
     header: {
-        marginTop: 40,
-        marginBottom: 20,
+        marginTop: PAD.xl + PAD.lg,
+        marginBottom: PAD.lg,
         width: '100%',
     },
     robotTitle: {
-        fontSize: fontSizes.xl,
-        color: colors.text,
-        fontWeight: 'bold',
+        ...TEXT.title,
+        fontSize: 26,
         letterSpacing: 1,
     },
     separator: {
         height: 2,
-        backgroundColor: colors.primary,
+        backgroundColor: COLORS.accent,
         width: 100,
-        marginTop: 8,
+        marginTop: PAD.sm,
     },
     statusSection: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: colors.surface,
-        padding: 20,
-        borderRadius: 15,
-        marginBottom: 30,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        ...CARD,
+        marginBottom: PAD.xl + PAD.md,
     },
     infoContainer: {
         flex: 1,
-        marginRight: 10,
+        marginRight: PAD.md - 2,
     },
     infoItem: {
-        marginBottom: 20,
+        marginBottom: PAD.lg + PAD.md,
     },
     label: {
-        fontSize: fontSizes.sm - 2,
-        color: colors.textSecondary,
-        fontWeight: 'bold',
-        marginBottom: 4,
-        letterSpacing: 1,
+        ...TEXT.label,
     },
     images: {
         width: '40%',
@@ -59,29 +47,26 @@ export default StyleSheet.create({
     },
     depurationContainer: {
         flex: 1,
-        marginBottom: 20,
+        marginBottom: PAD.lg,
     },
     actionsContainer: {
         width: '100%',
         alignItems: 'center',
         marginTop: 'auto',
-        marginBottom: 40,
+        marginBottom: PAD.xl + PAD.lg,
     },
     controlButton: {
         width: '100%',
         height: 50,
-        backgroundColor: colors.primary,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 12,
+        ...BUTTON.primary,
+        marginTop: PAD.md - 4,
     },
     actionsButton: {
-        backgroundColor: colors.primaryDark,
+        backgroundColor: COLORS.accentDark,
     },
     controlButtonText: {
-        fontSize: fontSizes.lg,
-        color: colors.white,
-        fontWeight: 'bold',
+        ...TEXT.title,
+        color: COLORS.white,
+        fontSize: 20,
     },
 });

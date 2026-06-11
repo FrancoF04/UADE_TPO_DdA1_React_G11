@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../../config/theme';
+import { COLORS } from '@/config/styles';
 
 export default StyleSheet.create({
     value: {
-        fontSize: fontSizes.lg,
-        color: colors.text,
+        fontSize: 20,
+        color: COLORS.text,
         textAlign: 'left',
         flexShrink: 1,
     },

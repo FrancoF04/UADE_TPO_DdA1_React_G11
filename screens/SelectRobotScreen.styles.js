@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSizes } from '../config/theme';
+import { COLORS, TEXT } from '@/config/styles';
 
 export default StyleSheet.create({
     container: {
@@ -7,11 +7,10 @@ export default StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.background,
+        backgroundColor: COLORS.bg,
     },
     title: {
-        fontSize: fontSizes.xl,
-        color: colors.text,
-        fontWeight: 'bold',
+        ...TEXT.title,
+        fontSize: 26,
     },
 });
