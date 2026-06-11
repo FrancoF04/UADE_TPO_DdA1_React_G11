@@ -25,7 +25,9 @@ export default function VirtualJoystick({ disabled, onMove, onStop }) {
           const dy = gestureState.dy * scale;
           setKnobOffset({ x: dx, y: dy });
           valuesRef.current = { x: dx / MAX_DISPLACEMENT, y: dy / MAX_DISPLACEMENT };
-          onMove?.(-valuesRef.current.y, 0, -valuesRef.current.x);
+          const vx = -valuesRef.current.y * 0.5;
+          const vyaw = -valuesRef.current.x * 0.99;
+          onMove?.(vx, 0, vyaw);
         },
         onPanResponderRelease: () => {
           setKnobOffset({ x: 0, y: 0 });
