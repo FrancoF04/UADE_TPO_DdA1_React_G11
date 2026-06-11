@@ -2,7 +2,7 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
-export default function ConectionButton() {
+export default function ConnectionButton() {
     const { isConnected, connectRobot, disconnectRobot } = useRobot();
     const status = isConnected;
 

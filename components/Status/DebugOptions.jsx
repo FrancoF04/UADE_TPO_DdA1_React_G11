@@ -2,10 +2,10 @@ import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
-export default function DepurationOptions() {
+export default function DebugOptions() {
     const { isConnected, statusData } = useRobot();
 
-    const depurationData = isConnected === 'Connected' && statusData
+    const debugData = isConnected === 'Connected' && statusData
         ? JSON.stringify(statusData, null, 2)
         : JSON.stringify('No robot connected', null, 2);
 
@@ -13,7 +13,7 @@ export default function DepurationOptions() {
         <View style={styles.container}>
             <Text style={styles.label}>DEPURATION OPTIONS</Text>
             <ScrollView showsVerticalScrollIndicator={true}>
-                <Text style={styles.text}>{depurationData}</Text>
+                <Text style={styles.text}>{debugData}</Text>
             </ScrollView>
         </View>
     );

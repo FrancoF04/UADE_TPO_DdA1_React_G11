@@ -2,9 +2,9 @@ import { TouchableOpacity } from "react-native";
 import { Text, StyleSheet } from "react-native";
 import { colors, fontSizes } from "../../config/theme";
 
-export default function DepurationOptionsButton({ setDepurationOptionsVisible }) {
+export default function DebugOptionsButton({ setDebugOptionsVisible }) {
     const handlePress = () => {
-        setDepurationOptionsVisible(prev => !prev);
+        setDebugOptionsVisible(prev => !prev);
     }
 
     return (

@@ -8,7 +8,7 @@ import MovementScreen from '@/screens/MovementScreen';
 import ActionsScreen from '@/screens/ActionsScreen';
 import LoginScreen from '@/screens/LoginScreen';
 import RegisterScreen from '@/screens/RegisterScreen';
-import ConectionStatus from '@/components/Status/ConectionStatus';
+import ConnectionStatus from '@/components/Status/ConnectionStatus';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +30,7 @@ export default function AppNavigator() {
         headerTintColor: COLORS.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: COLORS.bg },
-        headerRight: () => <ConectionStatus />,
+        headerRight: () => <ConnectionStatus />,
         headerRightContainerStyle: { marginRight: 10 },
       }}
     >
@@ -56,7 +56,7 @@ export default function AppNavigator() {
               title: 'Seleccionar Robot',
               headerRight: () => (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <ConectionStatus />
+                  <ConnectionStatus />
                   <TouchableOpacity onPress={logout}>
                     <Text style={{ color: COLORS.textSecondary, fontSize: 14 }}>Salir</Text>
                   </TouchableOpacity>

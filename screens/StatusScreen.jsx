@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useRobot } from '../hooks/useRobot';
 import { useImage } from '../hooks/useImage';
-import InterfazDeRed from '../components/Status/InterfazDeRed';
-import ConectionButton from '../components/Status/ConectionButton';
-import ConectionStatus from '../components/Status/ConectionStatus';
-import DepurationOptionsButton from '../components/Status/DepurationOptionsButton';
-import DepurationOptions from '../components/Status/DepurationOptions';
+import NetworkInterface from '../components/Status/NetworkInterface';
+import ConnectionButton from '../components/Status/ConnectionButton';
+import ConnectionStatus from '../components/Status/ConnectionStatus';
+import DebugOptionsButton from '../components/Status/DebugOptionsButton';
+import DebugOptions from '../components/Status/DebugOptions';
 
 export default function StatusScreen() {
     const { name, isConnected } = useRobot();
@@ -43,12 +43,12 @@ export default function StatusScreen() {
                 <View style={styles.infoContainer}>
                     <View style={styles.infoItem}>
                         <Text style={styles.label}>CONEXIÓN</Text>
-                        <ConectionStatus />
+                        <ConnectionStatus />
                     </View>
                     
                     <View style={styles.infoItem}>
                         <Text style={styles.label}>PARÁMETROS DE RED</Text>
-                        <InterfazDeRed />
+                        <NetworkInterface />
                     </View>
                 </View>
                 <Image 
@@ -57,10 +57,10 @@ export default function StatusScreen() {
                 />
             </View>
             
-            {isVisible && isConnected==='Connected' && <DepurationOptions />}
+                {isVisible && isConnected==='Connected' && <DebugOptions />}
             
             <View style={styles.actionsContainer}>
-                {isConnected==='Connected' && <DepurationOptionsButton setDepurationOptionsVisible={setIsVisible} />}
+                {isConnected==='Connected' && <DebugOptionsButton setDebugOptionsVisible={setIsVisible} />}
                 {isConnected==='Connected' && (
                     <TouchableOpacity
                         style={styles.controlButton}
@@ -79,7 +79,7 @@ export default function StatusScreen() {
                         <Text style={styles.controlButtonText}>Acciones</Text>
                     </TouchableOpacity>
                 )}
-                <ConectionButton />
+                <ConnectionButton />
             </View>
         </View>
     );

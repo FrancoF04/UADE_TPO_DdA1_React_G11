@@ -25,7 +25,7 @@ export default function MovementScreen() {
   // Keep ref in sync so interval callbacks always see the latest value
   isConnectedRef.current = isConnected;
 
-  // Detiene el robot al navegar fuera de la pantalla (evita movimiento sin control)
+  // Stops the robot when navigating away from the screen (prevents uncontrolled movement)
   useFocusEffect(
     useCallback(() => {
       return () => {

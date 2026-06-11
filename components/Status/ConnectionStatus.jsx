@@ -2,7 +2,7 @@ import { Text, StyleSheet, View } from 'react-native';
 import { colors, fontSizes } from '../../config/theme';
 import { useRobot } from '../../hooks/useRobot';
 
-export default function ConectionStatus() {
+export default function ConnectionStatus() {
     const { isConnected, reconnectAttempts } = useRobot();
     const status = isConnected;
 

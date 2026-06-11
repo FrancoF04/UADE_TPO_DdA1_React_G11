@@ -2,16 +2,16 @@ import { colors, fontSizes } from '../../config/theme';
 import { Text, StyleSheet } from 'react-native';
 import { useRobot } from '../../hooks/useRobot';
 
-export default function InterfazDeRed() {
-    const { NetworkInterface } = useRobot();
-    const network = NetworkInterface;
+export default function NetworkInterface() {
+    const { networkInterface } = useRobot();
+    const network = networkInterface;
     
-    const mensaje = network && network !== 'Connecting' && network !== 'Disconnected'
+    const message = network && network !== 'Connecting' && network !== 'Disconnected'
         ? network
         : 'No detectada';
 
     return (
-        <Text style={styles.value}>{mensaje}</Text>
+        <Text style={styles.value}>{message}</Text>
     );
 }
 
