@@ -18,7 +18,7 @@ const ROBOT_LABELS = {
 export default function MovementScreen() {
   const { isConnected: connectionStatus, robotType } = useRobot();
   const isConnected = connectionStatus === 'Connected';
-  const [feedback, setFeedback] = useState({ message: null, success: false });
+  const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const moveIntervalRef = useRef(null);
   const isConnectedRef = useRef(isConnected);
 
@@ -37,8 +37,7 @@ export default function MovementScreen() {
   );
 
   const showFeedback = (message, success) => {
-    setFeedback({ message, success });
-    setTimeout(() => setFeedback({ message: null, success: false }), 3000);
+    setFeedback({ message, success, key: Date.now() });
   };
 
   const startDirectionalMove = (vx, vy, vyaw) => {
@@ -93,7 +92,7 @@ export default function MovementScreen() {
 
         {!isConnected && <ConnectionBanner />}
 
-        <FeedbackToast message={feedback.message} success={feedback.success} />
+        <FeedbackToast message={feedback.message} success={feedback.success} trigger={feedback.key} />
 
         {/* D-Pad */}
         <View style={styles.section}>

@@ -6,6 +6,7 @@ export default StyleSheet.create({
     borderRadius: RADIUS.sm,
     padding: PAD.sm + 2,
     marginBottom: PAD.md,
+    overflow: 'hidden',
   },
   success: {
     backgroundColor: '#0f2d1a',
@@ -20,5 +21,17 @@ export default StyleSheet.create({
   text: {
     color: COLORS.text,
     fontSize: 13,
+  },
+  progressBar: {
+    height: 3,
+    borderRadius: RADIUS.sm,
+    marginTop: PAD.sm,
+    alignSelf: 'flex-start',
+  },
+  progressSuccess: {
+    backgroundColor: COLORS.green,
+  },
+  progressError: {
+    backgroundColor: COLORS.red,
   },
 });

@@ -31,7 +31,7 @@ export default function ActionsScreen() {
   const [actions, setActions] = useState([]);
   const [loadingActions, setLoadingActions] = useState(false);
   const [toggleStates, setToggleStates] = useState({});
-  const [feedback, setFeedback] = useState({ message: null, success: false });
+  const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const [history, setHistory] = useState([]);
 
   const robotTypeLower = robotType?.toLowerCase();
@@ -41,8 +41,7 @@ export default function ActionsScreen() {
   );
 
   const showFeedback = (message, success) => {
-    setFeedback({ message, success });
-    setTimeout(() => setFeedback({ message: null, success: false }), 3000);
+    setFeedback({ message, success, key: Date.now() });
   };
 
   const addToHistory = (label, success) => {
@@ -115,7 +114,7 @@ export default function ActionsScreen() {
 
         {!isActive && <ConnectionBanner />}
 
-        <FeedbackToast message={feedback.message} success={feedback.success} />
+        <FeedbackToast message={feedback.message} success={feedback.success} trigger={feedback.key} />
 
         {/* Standard actions */}
         <View style={styles.section}>
