@@ -18,14 +18,14 @@ const ROBOT_LABELS = {
 export default function MovementScreen() {
   const { isConnected: connectionStatus, robotType } = useRobot();
   const isConnected = connectionStatus === 'Connected';
-  const [feedback, setFeedback] = useState({ message: null, success: false });
+  const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const moveIntervalRef = useRef(null);
   const isConnectedRef = useRef(isConnected);
 
   // Keep ref in sync so interval callbacks always see the latest value
   isConnectedRef.current = isConnected;
 
-  // Detiene el robot al navegar fuera de la pantalla (evita movimiento sin control)
+  // Stops the robot when navigating away from the screen (prevents uncontrolled movement)
   useFocusEffect(
     useCallback(() => {
       return () => {
@@ -37,8 +37,7 @@ export default function MovementScreen() {
   );
 
   const showFeedback = (message, success) => {
-    setFeedback({ message, success });
-    setTimeout(() => setFeedback({ message: null, success: false }), 3000);
+    setFeedback({ message, success, key: Date.now() });
   };
 
   const startDirectionalMove = (vx, vy, vyaw) => {
@@ -93,7 +92,7 @@ export default function MovementScreen() {
 
         {!isConnected && <ConnectionBanner />}
 
-        <FeedbackToast message={feedback.message} success={feedback.success} />
+        <FeedbackToast message={feedback.message} success={feedback.success} trigger={feedback.key} />
 
         {/* D-Pad */}
         <View style={styles.section}>
@@ -104,7 +103,7 @@ export default function MovementScreen() {
                 label="↑"
                 subtitle="Adelante"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0.3, 0, 0)}
+                onPressIn={() => startDirectionalMove(0.5, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -113,7 +112,7 @@ export default function MovementScreen() {
                 label="←"
                 subtitle="Girar izq."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, 0.3)}
+                onPressIn={() => startDirectionalMove(0, 0, 0.99)}
                 onPressOut={stopDirectionalMove}
               />
               <View style={styles.dpadCenter}>
@@ -129,7 +128,7 @@ export default function MovementScreen() {
                 label="→"
                 subtitle="Girar der."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, -0.3)}
+                onPressIn={() => startDirectionalMove(0, 0, -0.99)}
                 onPressOut={stopDirectionalMove}
               />
             </View>
@@ -138,7 +137,7 @@ export default function MovementScreen() {
                 label="↓"
                 subtitle="Atrás"
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(-0.3, 0, 0)}
+                onPressIn={() => startDirectionalMove(-0.5, 0, 0)}
                 onPressOut={stopDirectionalMove}
               />
             </View>

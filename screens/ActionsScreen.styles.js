@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/config/colors';
+import { COLORS, PAD, TEXT } from '@/config/styles';
 
 export default StyleSheet.create({
   safe: {
@@ -7,26 +7,24 @@ export default StyleSheet.create({
     backgroundColor: COLORS.bg,
   },
   container: {
-    padding: 16,
-    paddingBottom: 32,
+    padding: PAD.lg,
+    paddingBottom: PAD.xl + PAD.md,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: PAD.md,
   },
   headerLeft: {
-    gap: 2,
+    gap: PAD.xs / 2,
   },
   title: {
+    ...TEXT.title,
     fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.text,
   },
   robotLabel: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
+    ...TEXT.subtitle,
   },
   statusDot: {
     width: 12,
@@ -40,35 +38,29 @@ export default StyleSheet.create({
     backgroundColor: COLORS.red,
   },
   section: {
-    marginTop: 20,
+    marginTop: PAD.lg + PAD.md,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 10,
+    ...TEXT.sectionTitle,
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginBottom: 10,
+    gap: PAD.md - 2,
+    marginBottom: PAD.md - 2,
   },
   loadingText: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
+    ...TEXT.subtitle,
     textAlign: 'center',
-    paddingVertical: 16,
+    paddingVertical: PAD.lg,
   },
   historyList: {
-    gap: 6,
+    gap: PAD.xs - 2,
   },
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 6,
+    gap: PAD.sm,
+    paddingVertical: PAD.xs - 2,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -93,9 +85,8 @@ export default StyleSheet.create({
     color: COLORS.disabled,
   },
   emptyHistory: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
+    ...TEXT.subtitle,
     textAlign: 'center',
-    paddingVertical: 12,
+    paddingVertical: PAD.md,
   },
 });

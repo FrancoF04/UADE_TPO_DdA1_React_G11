@@ -8,7 +8,7 @@ import MovementScreen from '@/screens/MovementScreen';
 import ActionsScreen from '@/screens/ActionsScreen';
 import LoginScreen from '@/screens/LoginScreen';
 import RegisterScreen from '@/screens/RegisterScreen';
-import ConectionStatus from '@/components/Status/ConectionStatus';
+import ConnectionStatus from '@/components/Status/ConnectionStatus';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,13 +25,12 @@ export default function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName="SelectRobot"
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.card },
         headerTintColor: COLORS.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: COLORS.bg },
-        headerRight: () => <ConectionStatus />,
+        headerRight: () => <ConnectionStatus />,
         headerRightContainerStyle: { marginRight: 10 },
       }}
     >
@@ -57,7 +56,7 @@ export default function AppNavigator() {
               title: 'Seleccionar Robot',
               headerRight: () => (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <ConectionStatus />
+                  <ConnectionStatus />
                   <TouchableOpacity onPress={logout}>
                     <Text style={{ color: COLORS.textSecondary, fontSize: 14 }}>Salir</Text>
                   </TouchableOpacity>
@@ -73,19 +72,7 @@ export default function AppNavigator() {
           <Stack.Screen
             name="Movement"
             component={MovementScreen}
-            options={({ navigation }) => ({
-              title: 'Control de Movimiento',
-              headerRight: () => (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <TouchableOpacity onPress={() => navigation.navigate('Actions')}>
-                    <Text style={{ color: COLORS.accent, fontWeight: '600', fontSize: 14 }}>
-                      Acciones
-                    </Text>
-                  </TouchableOpacity>
-                  <ConectionStatus />
-                </View>
-              ),
-            })}
+            options={{ title: 'Control de Movimiento' }}
           />
           <Stack.Screen
             name="Actions"

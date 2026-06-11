@@ -1,6 +1,6 @@
 import { api } from './api';
 
-export const conectionService = {
+export const connectionService = {
     connect: (robot_type) => api.post('/connect', { robot_type }),
 
     disconnect: () => api.post('/disconnect'),

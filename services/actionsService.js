@@ -1,7 +1,6 @@
 import { api } from '@/services/api';
 
 export const TOGGLE_ENDPOINTS = [
-  { key: 'freejump',    label: 'Salto libre',     robots: ['go2'] },
   { key: 'handstand',   label: 'Parado en manos', robots: ['go2'] },
   { key: 'freebound',   label: 'Free Bound',      robots: ['go2'] },
   { key: 'freeavoid',   label: 'Evasión libre',   robots: ['go2'] },

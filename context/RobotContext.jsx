@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
-import { conectionService } from '@/services/conectionService';
+import { connectionService } from '@/services/connectionService';
 
 export const RobotContext = createContext();
 
@@ -70,8 +70,8 @@ export function RobotProvider({ children }) {
     setReconnectingState();
     setReconnectAttempts(prev => prev + 1);
     try {
-      await conectionService.connect(robotNameRef.current);
-      const status = await conectionService.status();
+      await connectionService.connect(robotNameRef.current);
+      const status = await connectionService.status();
       setConnectedState(status.data.network_interface, status.data);
     } catch {
       reconnectTimerRef.current = setTimeout(attemptReconnect, RECONNECT_DELAY);
@@ -101,8 +101,8 @@ export function RobotProvider({ children }) {
     isReconnectingRef.current = false;
     setIsConnected('Connecting');
     try {
-      await conectionService.connect(robotNameRef.current);
-      const status = await conectionService.status();
+      await connectionService.connect(robotNameRef.current);
+      const status = await connectionService.status();
       setConnectedState(status.data.network_interface, status.data);
     } catch {
       setErrorState();
@@ -116,17 +116,17 @@ export function RobotProvider({ children }) {
     setReconnectAttempts(0);
     setStatusData(null);
     try {
-      await conectionService.disconnect();
+      await connectionService.disconnect();
       setIsConnected('Disconnected');
       setNetworkInterface(null);
     } catch (error) {
-      console.warn('[RobotContext] Error al desconectar:', error.message || error);
+      console.warn('[RobotContext] Disconnect error:', error.message || error);
     }
   }, [clearHeartbeatTimer, clearReconnectTimer]);
 
   const refreshStatus = useCallback(async () => {
     try {
-      const { data } = await conectionService.status();
+      const { data } = await connectionService.status();
       if (data.connection_state === 'connected') {
         setConnectedState(data.network_interface, data);
         if (data.robot_type) setName(data.robot_type);
@@ -152,7 +152,7 @@ export function RobotProvider({ children }) {
     }
     const checkStatus = async () => {
       try {
-        const response = await conectionService.status();
+        const response = await connectionService.status();
         const stillConnected = response?.data?.connection_state === 'connected';
         if (!stillConnected) {
           clearHeartbeatTimer();
@@ -200,6 +200,6 @@ export function RobotProvider({ children }) {
 
 export function useRobot() {
   const ctx = useContext(RobotContext);
-  if (!ctx) throw new Error('useRobot debe usarse dentro de <RobotProvider>');
+  if (!ctx) throw new Error('useRobot must be used within a <RobotProvider>');
   return ctx;
 }

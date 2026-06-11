@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/config/colors';
+import { COLORS, BUTTON, PAD } from '@/config/styles';
 
 export const JOYSTICK_RADIUS = 70;
 export const KNOB_RADIUS = 24;
@@ -11,7 +11,7 @@ export default StyleSheet.create({
   hint: {
     fontSize: 11,
     color: COLORS.textSecondary,
-    marginBottom: 16,
+    marginBottom: PAD.lg,
   },
   outer: {
     width: JOYSTICK_RADIUS * 2,
@@ -24,7 +24,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
   },
   outerDisabled: {
-    opacity: 0.35,
+    ...BUTTON.disabled,
   },
   knob: {
     width: KNOB_RADIUS * 2,
@@ -36,7 +36,7 @@ export default StyleSheet.create({
     backgroundColor: COLORS.disabled,
   },
   disabledText: {
-    marginTop: 8,
+    marginTop: PAD.sm,
     fontSize: 11,
     color: COLORS.textSecondary,
   },

@@ -1,33 +1,33 @@
 export const colors = {
   // Base
-  primary: '#2196F3',       // Azul tecnológico para acciones principales
+  primary: '#2196F3',       // Tech blue for main actions
   primaryDark: '#1976D2',
-  secondary: '#FFC107',     // Ámbar para elementos de advertencia o joysticks
+  secondary: '#FFC107',     // Amber for warning elements or joysticks
   
-  // Fondo e Interfaz (Enfoque Dark Industrial)
-  background: '#121212',    // Fondo profundo para evitar reflejos
-  surface: '#1E1E1E',       // Superficie para tarjetas y botones
+  // Background and Interface (Dark Industrial focus)
+  background: '#121212',    // Deep background to avoid reflections
+  surface: '#1E1E1E',       // Surface for cards and buttons
   border: '#333333',
   
-  // Texto
-  text: '#FFFFFF',          // Texto principal en blanco para contraste
-  textSecondary: '#B0BEC5', // Gris azulado para información secundaria
+  // Text
+  text: '#FFFFFF',          // Main text in white for contrast
+  textSecondary: '#B0BEC5', // Bluish gray for secondary information
   
-  // Estados de Conexión (Lo que pediste)
-  connect: '#43A047',       // Verde vibrante para "Conectar"
-  connecting: '#FFB300',    // Ámbar para "Conectando..." o error de conexión
-  disconnect: '#E53935',    // Rojo intenso para "Desconectar"
+  // Connection States
+  connect: '#43A047',       // Vibrant green for "Connect"
+  connecting: '#FFB300',    // Amber for "Connecting..." or connection error
+  disconnect: '#E53935',    // Intense red for "Disconnect"
   
-  // Otros estados
+  // Other states
   success: '#4CAF50',
   error: '#FF5252',
   warning: '#FB8C00',
   info: '#00BCD4',
   
-  // Utilitarios
+  // Utilities
   white: '#FFFFFF',
   black: '#000000',
-  ghost: 'rgba(255, 255, 255, 0.1)', // Para botones secundarios transparentes
+  ghost: 'rgba(255, 255, 255, 0.1)', // For transparent secondary buttons
 };
 
 export const spacing = {

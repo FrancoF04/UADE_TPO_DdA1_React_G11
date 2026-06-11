@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/config/colors';
+import { COLORS, BUTTON, INPUT, TEXT, PAD } from '@/config/styles';
 
 export default StyleSheet.create({
   container: {
@@ -9,54 +9,39 @@ export default StyleSheet.create({
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: PAD.xl + PAD.md,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
+    ...TEXT.title,
+    marginBottom: PAD.xs,
   },
   subtitle: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginBottom: 32,
+    ...TEXT.subtitle,
+    marginBottom: PAD.xl + PAD.md,
   },
   input: {
-    backgroundColor: COLORS.card,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    color: COLORS.text,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 15,
-    marginBottom: 12,
+    ...INPUT,
+    marginBottom: PAD.md,
   },
   error: {
     color: COLORS.red,
     fontSize: 13,
-    marginBottom: 12,
+    marginBottom: PAD.md,
   },
   success: {
     color: COLORS.green,
     fontSize: 13,
-    marginBottom: 12,
+    marginBottom: PAD.md,
   },
   btn: {
-    backgroundColor: COLORS.accent,
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 16,
+    ...BUTTON.primary,
+    marginBottom: PAD.lg,
   },
   btnDisabled: {
     opacity: 0.5,
   },
   btnText: {
-    color: COLORS.white,
-    fontWeight: '700',
-    fontSize: 15,
+    ...TEXT.buttonLabel,
   },
   link: {
     color: COLORS.accent,
