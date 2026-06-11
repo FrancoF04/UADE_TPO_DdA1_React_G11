@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { colors, fontSizes } from '../config/theme';
+import { Text, View } from 'react-native';
+import styles from './SelectRobotScreen.styles';
 import RobotButton from '../components/SelectRobot/RobotButton';
 import { useImage } from '../hooks/useImage';
 
@@ -12,17 +12,3 @@ export default function SelectRobotScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.background,
-    },
-    title: {
-        fontSize: fontSizes.xl,
-        color: colors.text,
-        fontWeight: 'bold',
-    },
-});

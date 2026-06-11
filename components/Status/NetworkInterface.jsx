@@ -1,5 +1,5 @@
-import { colors, fontSizes } from '../../config/theme';
-import { Text, StyleSheet } from 'react-native';
+import { Text } from 'react-native';
+import styles from './NetworkInterface.styles';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function NetworkInterface() {
@@ -15,11 +15,3 @@ export default function NetworkInterface() {
     );
 }
 
-const styles = StyleSheet.create({
-    value: {
-        fontSize: fontSizes.lg,
-        color: colors.text,
-        textAlign: 'left',
-        flexShrink: 1,
-    },
-});

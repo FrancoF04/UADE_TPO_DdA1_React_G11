@@ -1,5 +1,5 @@
-import { Text, StyleSheet, View } from 'react-native';
-import { colors, fontSizes } from '../../config/theme';
+import { Text, View } from 'react-native';
+import styles from './ConnectionStatus.styles';
 import { useRobot } from '../../hooks/useRobot';
 
 export default function ConnectionStatus() {
@@ -28,20 +28,3 @@ export default function ConnectionStatus() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statusIndicator: {
-        width: 12,
-        height: 12,
-        borderRadius: 30,
-        marginRight: 8,
-    },
-    statusText: {
-        fontSize: fontSizes.lg,
-        color: colors.text,
-        flexShrink: 1,
-    },
-});
