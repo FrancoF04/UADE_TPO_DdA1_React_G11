@@ -1,13 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRobot } from '@/context/RobotContext';
+import { useAuth } from '@/context/AuthContext';
 import { actionsService, TOGGLE_ENDPOINTS } from '@/services/actionsService';
 import ActionButton from '@/components/ActionButton/ActionButton';
 import ToggleButton from '@/components/ToggleButton/ToggleButton';
 import FeedbackToast from '@/components/FeedbackToast/FeedbackToast';
 import ConnectionBanner from '@/components/ConnectionBanner/ConnectionBanner';
 import styles from './ActionsScreen.styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ROBOT_LABELS = {
   go2: 'Go2 (cuadrúpedo)',
@@ -24,8 +26,19 @@ function timestamp() {
   return new Date().toTimeString().slice(0, 8);
 }
 
+function makeHistoryId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+//guardar historial pasado por usuario
+function historyStorageKey(username) {
+  return `pastHistory_${username}`;
+}
+
 export default function ActionsScreen() {
   const { isConnected, robotType } = useRobot();
+  const { user } = useAuth();
+  const username = user?.username ?? null;
   const isActive = isConnected === 'Connected';
 
   const [actions, setActions] = useState([]);
@@ -33,6 +46,17 @@ export default function ActionsScreen() {
   const [toggleStates, setToggleStates] = useState({});
   const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const [history, setHistory] = useState([]);
+  const [pastHistory, setPastHistory] = useState([]);
+  const historyRef = useRef(history);
+  const usernameRef = useRef(username);
+
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+
+  useEffect(() => {
+    usernameRef.current = username;
+  }, [username]);
 
   const robotTypeLower = robotType?.toLowerCase();
 
@@ -46,7 +70,7 @@ export default function ActionsScreen() {
 
   const addToHistory = (label, success) => {
     setHistory(prev =>
-      [{ id: Date.now(), label, success, time: timestamp() }, ...prev].slice(0, 30)
+      [{ id: makeHistoryId(), label, success, time: timestamp() }, ...prev].slice(0, 30)
     );
   };
 
@@ -67,8 +91,59 @@ export default function ActionsScreen() {
     useCallback(() => {
       loadActions();
       setToggleStates({});
-    }, [loadActions])
+      return () => {
+        flushCurrentSessionHistory();
+      };
+    }, [loadActions, flushCurrentSessionHistory])
   );
+
+
+
+  const loadPastHistory = useCallback(async () => {
+    if (!username) return;
+    try {
+      const stored = await AsyncStorage.getItem(historyStorageKey(username));
+      if (stored) {
+        setPastHistory(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error('Error loading past history:', error);
+    }
+  }, [username]);
+
+  const savePastHistory = useCallback(async (newHistory) => {
+    if (!username) return;
+    try {
+      await AsyncStorage.setItem(historyStorageKey(username), JSON.stringify(newHistory));
+    } catch (error) {
+      console.error('Error saving past history:', error);
+    }
+  }, [username]);
+
+  const flushCurrentSessionHistory = useCallback(async () => {
+    const currentUsername = usernameRef.current;
+    const currentHistory = historyRef.current;
+    if (!currentUsername || currentHistory.length === 0) return;
+
+    try {
+      const stored = await AsyncStorage.getItem(historyStorageKey(currentUsername));
+      const existingHistory = stored ? JSON.parse(stored) : [];
+      const combined = [...currentHistory, ...existingHistory].slice(0, 100);
+      await AsyncStorage.setItem(historyStorageKey(currentUsername), JSON.stringify(combined));
+      setPastHistory(combined);
+      setHistory([]);
+    } catch (error) {
+      console.error('Error flushing session history:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPastHistory();
+  }, [loadPastHistory]);
+
+  useEffect(() => {
+    savePastHistory(pastHistory);
+  }, [pastHistory, savePastHistory]);
 
   const handleExecuteAction = async (name) => {
     try {
@@ -162,14 +237,32 @@ export default function ActionsScreen() {
           </View>
         )}
 
-        {/* History */}
+        {/* Historial acciones sesion actual */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Historial de sesión</Text>
+          <Text style={styles.sectionTitle}>Historial de sesión actual</Text>
           {history.length === 0 ? (
             <Text style={styles.emptyHistory}>Sin acciones ejecutadas aún.</Text>
           ) : (
             <View style={styles.historyList}>
               {history.map(item => (
+                <View key={item.id} style={styles.historyItem}>
+                  <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
+                  <Text style={styles.historyText}>{item.label}</Text>
+                  <Text style={styles.historyTime}>{item.time}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Historial de acciones sesiones anteriores */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Historial de sesiones pasadas</Text>
+          {pastHistory.length === 0 ? (
+            <Text style={styles.emptyHistory}>Sin acciones de sesiones pasadas.</Text>
+          ) : (
+            <View style={styles.historyList}>
+              {pastHistory.map(item => (
                 <View key={item.id} style={styles.historyItem}>
                   <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
                   <Text style={styles.historyText}>{item.label}</Text>
