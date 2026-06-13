@@ -30,6 +30,7 @@ function makeHistoryId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+//guardar historial pasado por usuario
 function historyStorageKey(username) {
   return `pastHistory_${username}`;
 }
