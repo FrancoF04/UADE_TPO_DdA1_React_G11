@@ -33,6 +33,7 @@ export default function ActionsScreen() {
   const [toggleStates, setToggleStates] = useState({});
   const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const [history, setHistory] = useState([]);
+  const [pastHistory, setPastHistory] = useState([]);
 
   const robotTypeLower = robotType?.toLowerCase();
 
@@ -162,7 +163,7 @@ export default function ActionsScreen() {
           </View>
         )}
 
-        {/* History */}
+        {/* Historial acciones sesion actual */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Historial de sesión</Text>
           {history.length === 0 ? (
@@ -170,6 +171,24 @@ export default function ActionsScreen() {
           ) : (
             <View style={styles.historyList}>
               {history.map(item => (
+                <View key={item.id} style={styles.historyItem}>
+                  <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
+                  <Text style={styles.historyText}>{item.label}</Text>
+                  <Text style={styles.historyTime}>{item.time}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Historial de acciones sesiones anteriores */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Historial de sesiones pasadas</Text>
+          {pastHistory.length === 0 ? (
+            <Text style={styles.emptyHistory}>Sin acciones de sesiones pasadas.</Text>
+          ) : (
+            <View style={styles.historyList}>
+              {pastHistory.map(item => (
                 <View key={item.id} style={styles.historyItem}>
                   <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
                   <Text style={styles.historyText}>{item.label}</Text>
