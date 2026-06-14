@@ -70,13 +70,18 @@ export function RobotProvider({ children }) {
     setReconnectingState();
     setReconnectAttempts(prev => prev + 1);
     try {
-      await connectionService.connect(robotNameRef.current);
+      await safeConnect(robotNameRef.current);
       const status = await connectionService.status();
       setConnectedState(status.data.network_interface, status.data);
-    } catch {
+    } catch (error) {
+      const isNetworkError = !error.response;
+      if (!isNetworkError) {
+        setErrorState();
+        return;
+      }
       reconnectTimerRef.current = setTimeout(attemptReconnect, RECONNECT_DELAY);
     }
-  }, [setErrorState, setReconnectingState, setConnectedState]);
+  }, [safeConnect, setErrorState, setReconnectingState, setConnectedState]);
 
   const selectRobot = useCallback((robot) => {
     setName(robot.name);
@@ -95,19 +100,36 @@ export function RobotProvider({ children }) {
     setNetworkInterface(null);
   }, [clearHeartbeatTimer, clearReconnectTimer]);
 
+  const safeConnect = useCallback(async (robotName) => {
+    try {
+      await connectionService.connect(robotName);
+      return;
+    } catch (error) {
+      // Si el backend dice que ya hay un robot conectado, forzar desconexión y reintentar
+      if (error.response?.status !== 409) throw error;
+
+      try {
+        await connectionService.disconnect();
+        await connectionService.connect(robotName);
+      } catch (retryError) {
+        throw retryError;
+      }
+    }
+  }, []);
+
   const connectRobot = useCallback(async () => {
     clearReconnectTimer();
     setReconnectAttempts(0);
     isReconnectingRef.current = false;
     setIsConnected('Connecting');
     try {
-      await connectionService.connect(robotNameRef.current);
+      await safeConnect(robotNameRef.current);
       const status = await connectionService.status();
       setConnectedState(status.data.network_interface, status.data);
     } catch {
       setErrorState();
     }
-  }, [clearReconnectTimer, setConnectedState, setErrorState]);
+  }, [safeConnect, clearReconnectTimer, setConnectedState, setErrorState]);
 
   const disconnectRobot = useCallback(async () => {
     clearHeartbeatTimer();
@@ -150,28 +172,39 @@ export function RobotProvider({ children }) {
       clearHeartbeatTimer();
       return;
     }
+
     const checkStatus = async () => {
       try {
         const response = await connectionService.status();
-        const stillConnected = response?.data?.connection_state === 'connected';
-        if (!stillConnected) {
-          clearHeartbeatTimer();
-          attemptReconnect();
-        } else {
-          setStatusData(prev => {
-            const next = response.data;
-            if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
-            return next;
-          });
+        const state = response?.data?.connection_state;
+
+        if (state === 'connected') {
+          setConnectedState(response.data.network_interface, response.data);
+          return;
         }
-      } catch {
+
+        // El backend reporta desconectado: sincronizar estado local
         clearHeartbeatTimer();
-        attemptReconnect();
+        setIsConnected('Disconnected');
+        setNetworkInterface(null);
+        setStatusData(null);
+      } catch (error) {
+        // Error de red: no sabemos el estado real. Forzar desconexión y dejar que el usuario reconecte.
+        clearHeartbeatTimer();
+        try {
+          await connectionService.disconnect();
+        } catch {
+          // Ignorar: si falló por red, el backend no recibió nada; si falló por estado, ya no estaba conectado
+        }
+        setIsConnected('Disconnected');
+        setNetworkInterface(null);
+        setStatusData(null);
       }
     };
+
     heartbeatTimerRef.current = setInterval(checkStatus, HEARTBEAT_INTERVAL);
     return () => clearHeartbeatTimer();
-  }, [isConnected, attemptReconnect, clearHeartbeatTimer]);
+  }, [isConnected, setConnectedState, clearHeartbeatTimer]);
 
   useEffect(() => {
     refreshStatus();
