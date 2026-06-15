@@ -35,8 +35,12 @@ function historyStorageKey(username) {
   return `pastHistory_${username}`;
 }
 
+function sessionHistoryStorageKey(username) {
+  return `sessionHistory_${username}`;
+}
+
 export default function ActionsScreen() {
-  const { isConnected, robotType } = useRobot();
+  const { isConnected, robotType, connectionId } = useRobot();
   const { user } = useAuth();
   const username = user?.username ?? null;
   const isActive = isConnected === 'Connected';
@@ -47,8 +51,11 @@ export default function ActionsScreen() {
   const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const [history, setHistory] = useState([]);
   const [pastHistory, setPastHistory] = useState([]);
+  const [sessionHistoryLoaded, setSessionHistoryLoaded] = useState(false);
+  const [pastHistoryLoaded, setPastHistoryLoaded] = useState(false);
   const historyRef = useRef(history);
   const usernameRef = useRef(username);
+  const prevIsConnectedRef = useRef(isConnected);
 
   useEffect(() => {
     historyRef.current = history;
@@ -57,6 +64,22 @@ export default function ActionsScreen() {
   useEffect(() => {
     usernameRef.current = username;
   }, [username]);
+
+  // Flush current session history only when the robot truly disconnects or errors out.
+  useEffect(() => {
+    const prev = prevIsConnectedRef.current;
+    const isDisconnectState = isConnected === 'Disconnected' || isConnected === 'Error';
+
+    if (prev === 'Connected' && isDisconnectState) {
+      flushCurrentSessionHistory();
+    }
+
+    if (isConnected === 'Connected' && prev !== 'Connected') {
+      setHistory([]);
+    }
+
+    prevIsConnectedRef.current = isConnected;
+  }, [isConnected, flushCurrentSessionHistory]);
 
   const robotTypeLower = robotType?.toLowerCase();
 
@@ -91,13 +114,50 @@ export default function ActionsScreen() {
     useCallback(() => {
       loadActions();
       setToggleStates({});
-      return () => {
-        flushCurrentSessionHistory();
-      };
-    }, [loadActions, flushCurrentSessionHistory])
+      loadSessionHistory();
+      loadPastHistory();
+    }, [loadActions, loadSessionHistory, loadPastHistory])
   );
 
+  const loadSessionHistory = useCallback(async () => {
+    if (!username) {
+      setHistory([]);
+      setSessionHistoryLoaded(true);
+      return;
+    }
 
+    if (!isActive) {
+      try {
+        await flushStoredSessionHistory();
+      } catch (error) {
+        console.error('Error flushing stored session history before load:', error);
+      } finally {
+        setHistory([]);
+        setSessionHistoryLoaded(true);
+      }
+      return;
+    }
+
+    try {
+      const stored = await AsyncStorage.getItem(sessionHistoryStorageKey(username));
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.connectionId !== connectionId) {
+          await flushStoredSessionHistory();
+          setHistory([]);
+        } else {
+          setHistory(parsed.history ?? []);
+        }
+      } else {
+        setHistory([]);
+      }
+    } catch (error) {
+      console.error('Error loading session history:', error);
+      setHistory([]);
+    } finally {
+      setSessionHistoryLoaded(true);
+    }
+  }, [username, isActive, flushStoredSessionHistory]);
 
   const loadPastHistory = useCallback(async () => {
     if (!username) return;
@@ -108,6 +168,8 @@ export default function ActionsScreen() {
       }
     } catch (error) {
       console.error('Error loading past history:', error);
+    } finally {
+      setPastHistoryLoaded(true);
     }
   }, [username]);
 
@@ -117,6 +179,39 @@ export default function ActionsScreen() {
       await AsyncStorage.setItem(historyStorageKey(username), JSON.stringify(newHistory));
     } catch (error) {
       console.error('Error saving past history:', error);
+    }
+  }, [username]);
+
+  const saveSessionHistory = useCallback(async (newHistory) => {
+    if (!username || !connectionId) return;
+    try {
+      await AsyncStorage.setItem(
+        sessionHistoryStorageKey(username),
+        JSON.stringify({ connectionId, history: newHistory })
+      );
+    } catch (error) {
+      console.error('Error saving session history:', error);
+    }
+  }, [username, connectionId]);
+
+  const flushStoredSessionHistory = useCallback(async () => {
+    if (!username) return;
+
+    try {
+      const storedSession = await AsyncStorage.getItem(sessionHistoryStorageKey(username));
+      if (!storedSession) return;
+
+      const sessionData = JSON.parse(storedSession);
+      const sessionItems = Array.isArray(sessionData?.history) ? sessionData.history : [];
+      const storedPast = await AsyncStorage.getItem(historyStorageKey(username));
+      const pastData = storedPast ? JSON.parse(storedPast) : [];
+      const combined = [...sessionItems, ...pastData].slice(0, 100);
+      await AsyncStorage.setItem(historyStorageKey(username), JSON.stringify(combined));
+      await AsyncStorage.removeItem(sessionHistoryStorageKey(username));
+      setPastHistory(combined);
+      setHistory([]);
+    } catch (error) {
+      console.error('Error flushing stored session history:', error);
     }
   }, [username]);
 
@@ -130,6 +225,7 @@ export default function ActionsScreen() {
       const existingHistory = stored ? JSON.parse(stored) : [];
       const combined = [...currentHistory, ...existingHistory].slice(0, 100);
       await AsyncStorage.setItem(historyStorageKey(currentUsername), JSON.stringify(combined));
+      await AsyncStorage.removeItem(sessionHistoryStorageKey(currentUsername));
       setPastHistory(combined);
       setHistory([]);
     } catch (error) {
@@ -139,11 +235,18 @@ export default function ActionsScreen() {
 
   useEffect(() => {
     loadPastHistory();
-  }, [loadPastHistory]);
+    loadSessionHistory();
+  }, [loadPastHistory, loadSessionHistory]);
 
   useEffect(() => {
+    if (!pastHistoryLoaded) return;
     savePastHistory(pastHistory);
   }, [pastHistory, savePastHistory]);
+
+  useEffect(() => {
+    if (!sessionHistoryLoaded) return;
+    saveSessionHistory(history);
+  }, [history, saveSessionHistory, sessionHistoryLoaded]);
 
   const handleExecuteAction = async (name) => {
     try {
