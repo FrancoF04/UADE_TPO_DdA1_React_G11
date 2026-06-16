@@ -53,6 +53,7 @@ export function HistoryProvider({ children }) {
   const historyRef = useRef(history);
   const usernameRef = useRef(username);
   const prevIsConnectedRef = useRef(isConnected);
+  const initialFlushDoneRef = useRef(false);
 
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => { usernameRef.current = username; }, [username]);
@@ -124,14 +125,8 @@ export function HistoryProvider({ children }) {
     }
 
     if (isConnected !== 'Connected') {
-      try {
-        await flushStoredSessionHistory();
-      } catch (error) {
-        console.error('Error flushing stored session history before load:', error);
-      } finally {
-        setHistory([]);
-        setSessionHistoryLoaded(true);
-      }
+      setHistory([]);
+      setSessionHistoryLoaded(true);
       return;
     }
 
@@ -191,6 +186,17 @@ export function HistoryProvider({ children }) {
 
     prevIsConnectedRef.current = isConnected;
   }, [isConnected, flushCurrentSessionHistory]);
+
+  // Flush de sesión huérfana al montar (solo una vez por username).
+  // Maneja el caso de que la app se haya cerrado mientras el robot estaba conectado.
+  useEffect(() => {
+    if (!username || initialFlushDoneRef.current) return;
+    initialFlushDoneRef.current = true;
+    if (isConnected !== 'Connected') {
+      flushStoredSessionHistory();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
 
   useEffect(() => {
     loadPastHistory();
