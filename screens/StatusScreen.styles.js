@@ -7,6 +7,12 @@ export default StyleSheet.create({
         backgroundColor: COLORS.bg,
         paddingHorizontal: PAD.xl,
     },
+    scroll: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: PAD.md,
+    },
     header: {
         marginTop: PAD.xl + PAD.lg,
         marginBottom: PAD.lg,
@@ -52,8 +58,9 @@ export default StyleSheet.create({
     actionsContainer: {
         width: '100%',
         alignItems: 'center',
-        marginTop: 'auto',
-        marginBottom: PAD.xl + PAD.lg,
+        paddingTop: PAD.md,
+        paddingBottom: PAD.xl + PAD.lg,
+        backgroundColor: COLORS.bg,
     },
     controlButton: {
         width: '100%',

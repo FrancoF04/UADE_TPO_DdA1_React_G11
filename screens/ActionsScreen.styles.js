@@ -53,40 +53,4 @@ export default StyleSheet.create({
     textAlign: 'center',
     paddingVertical: PAD.lg,
   },
-  historyList: {
-    gap: PAD.xs - 2,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: PAD.sm,
-    paddingVertical: PAD.xs - 2,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  historyDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-  },
-  historyDotOk: {
-    backgroundColor: COLORS.green,
-  },
-  historyDotErr: {
-    backgroundColor: COLORS.red,
-  },
-  historyText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    flex: 1,
-  },
-  historyTime: {
-    fontSize: 11,
-    color: COLORS.white,
-  },
-  emptyHistory: {
-    ...TEXT.subtitle,
-    textAlign: 'center',
-    paddingVertical: PAD.md,
-  },
 });
