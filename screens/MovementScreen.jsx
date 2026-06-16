@@ -80,7 +80,7 @@ export default function MovementScreen() {
     const moving = Math.abs(vx) > 0.01 || Math.abs(vyaw) > 0.01 || Math.abs(vy) > 0.01;
     if (moving && !joystickMovingRef.current) {
       joystickMovingRef.current = true;
-      const label = `Joystick: vx=${vx.toFixed(2)} vy=${vy.toFixed(2)} vyaw=${vyaw.toFixed(2)}`;
+      const label = `Joystick: vx=${vx.toFixed(2)} vy=${vy.toFixed(2)}`;
       addToHistory(label, true);
     }
   };
@@ -131,7 +131,7 @@ export default function MovementScreen() {
                 label="←"
                 subtitle="Girar izq."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, 0.99)}
+                onPressIn={() => startDirectionalMove(0, 0, 0.9)}
                 onPressOut={stopDirectionalMove}
               />
               <View style={styles.dpadCenter}>
@@ -147,7 +147,7 @@ export default function MovementScreen() {
                 label="→"
                 subtitle="Girar der."
                 disabled={!isConnected}
-                onPressIn={() => startDirectionalMove(0, 0, -0.99)}
+                onPressIn={() => startDirectionalMove(0, 0, -0.9)}
                 onPressOut={stopDirectionalMove}
               />
             </View>

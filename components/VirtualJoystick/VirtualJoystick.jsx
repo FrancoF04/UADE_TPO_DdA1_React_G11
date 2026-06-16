@@ -3,6 +3,8 @@ import { View, Text, PanResponder } from 'react-native';
 import styles, { JOYSTICK_RADIUS, KNOB_RADIUS } from './VirtualJoystick.styles';
 
 const MAX_DISPLACEMENT = JOYSTICK_RADIUS - KNOB_RADIUS;
+const MAX_LINEAR = 0.5; // tope para vx y vy según los límites del backend
+const clamp = (v, max = MAX_LINEAR) => Math.max(-max, Math.min(max, v));
 
 export default function VirtualJoystick({ disabled, onMove, onStop }) {
   const [knobOffset, setKnobOffset] = useState({ x: 0, y: 0 });
@@ -25,9 +27,9 @@ export default function VirtualJoystick({ disabled, onMove, onStop }) {
           const dy = gestureState.dy * scale;
           setKnobOffset({ x: dx, y: dy });
           valuesRef.current = { x: dx / MAX_DISPLACEMENT, y: dy / MAX_DISPLACEMENT };
-          const vx = -valuesRef.current.y * 0.5;
-          const vyaw = -valuesRef.current.x * 0.99;
-          onMove?.(vx, 0, vyaw);
+          const vx = clamp(-valuesRef.current.y * MAX_LINEAR); // eje Y → adelante/atrás
+          const vy = clamp(-valuesRef.current.x * MAX_LINEAR); // eje X → lateral
+          onMove?.(vx, vy, 0); // diagonal = vx + vy combinados; la rotación va por el D-Pad
         },
         onPanResponderRelease: () => {
           setKnobOffset({ x: 0, y: 0 });
@@ -45,7 +47,7 @@ export default function VirtualJoystick({ disabled, onMove, onStop }) {
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.hint}>Eje Y → adelante/atrás · Eje X → rotación</Text>
+      <Text style={styles.hint}>Eje Y → adelante/atrás · Eje X → lateral</Text>
       <View
         style={[styles.outer, disabled && styles.outerDisabled]}
         {...panResponder.panHandlers}
