@@ -165,6 +165,15 @@ export function HistoryProvider({ children }) {
     }
   }, [username]);
 
+  // Limpiar historia cuando cambia de usuario (logout/login)
+  useEffect(() => {
+    if (!username) {
+      setHistory([]);
+      setPastHistory([]);
+      initialFlushDoneRef.current = false;
+    }
+  }, [username]);
+
   // Flush current session history only when the robot truly disconnects or errors out.
   useEffect(() => {
     const prev = prevIsConnectedRef.current;
@@ -187,10 +196,19 @@ export function HistoryProvider({ children }) {
     prevIsConnectedRef.current = isConnected;
   }, [isConnected, flushCurrentSessionHistory]);
 
-  // Flush de sesión huérfana al montar (solo una vez por username).
+  // Flush de sesión huérfana al cambiar de usuario o montar.
   // Maneja el caso de que la app se haya cerrado mientras el robot estaba conectado.
   useEffect(() => {
-    if (!username || initialFlushDoneRef.current) return;
+    if (!username) {
+      initialFlushDoneRef.current = false;
+      return;
+    }
+    // Resetear el flag cuando cambia de usuario para asegurar flush por usuario
+    if (usernameRef.current !== username) {
+      initialFlushDoneRef.current = false;
+      usernameRef.current = username;
+    }
+    if (initialFlushDoneRef.current) return;
     initialFlushDoneRef.current = true;
     if (isConnected !== 'Connected') {
       flushStoredSessionHistory();
