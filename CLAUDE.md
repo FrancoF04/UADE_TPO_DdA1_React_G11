@@ -111,21 +111,23 @@ Feature 1 puede navegar hacia ella con `navigation.navigate('Movement')`.
 
 | Control | Endpoint | Valores |
 |---------|----------|---------|
-| Botón ↑ (hold) | `POST /move` | `vx=0.3, vy=0, vyaw=0` |
-| Botón ↓ (hold) | `POST /move` | `vx=-0.3, vy=0, vyaw=0` |
-| Botón ← (hold) | `POST /move` | `vx=0, vy=0, vyaw=0.3` |
-| Botón → (hold) | `POST /move` | `vx=0, vy=0, vyaw=-0.3` |
+| Botón ↑ (hold) | `POST /move` | `vx=0.5, vy=0, vyaw=0` |
+| Botón ↓ (hold) | `POST /move` | `vx=-0.5, vy=0, vyaw=0` |
+| Botón ← (hold) | `POST /move` | `vx=0, vy=0, vyaw=0.9` |
+| Botón → (hold) | `POST /move` | `vx=0, vy=0, vyaw=-0.9` |
 | Soltar cualquier botón | `POST /stop` | — |
 | STOP | `POST /stop` | — |
 | Pararse | `POST /standup` | — |
 | Sentarse | `POST /sitdown` | — |
-| Joystick Y | `POST /move` | `vx` proporcional (-1 a 1) |
-| Joystick X | `POST /move` | `vyaw` proporcional (-1 a 1) |
+| Joystick Y | `POST /move` | `vx` proporcional (-0.5 a 0.5) |
+| Joystick X | `POST /move` | `vy` proporcional (-0.5 a 0.5) — lateral, derecha = negativo |
 | Soltar joystick | `POST /stop` | — |
 | Salir de la pantalla | `POST /stop` | via `useFocusEffect` cleanup |
 
 Los botones direccionales envían comandos repetidos cada **150ms** mientras se mantienen presionados (usando `setInterval` + `onPressIn`/`onPressOut`).
 Al navegar fuera de `MovementScreen` (back, otra pantalla) se limpia el intervalo y se manda stop automáticamente — evita que el robot quede moviéndose sin control.
+
+**Límites de velocidad (backend):** `vx`/`vy` ≤ 0.5 · `vyaw` entre 0.5 y 0.9. El joystick clampea `vx`/`vy` a ±0.5 y permite traslación combinada (diagonal = `vx`+`vy`); la rotación (`vyaw`) se hace solo con los botones ← →.
 
 ---
 
