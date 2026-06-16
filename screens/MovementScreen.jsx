@@ -2,6 +2,8 @@ import { useState, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRobot } from '@/context/RobotContext';
+import { useAuth } from '@/context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { robotService } from '@/services/robotService';
 import DirButton from '@/components/DirButton/DirButton';
 import ActionButton from '@/components/ActionButton/ActionButton';
@@ -16,7 +18,9 @@ const ROBOT_LABELS = {
 };
 
 export default function MovementScreen() {
-  const { isConnected: connectionStatus, robotType } = useRobot();
+  const { isConnected: connectionStatus, robotType, connectionId } = useRobot();
+  const { user } = useAuth();
+  const username = user?.username ?? null;
   const isConnected = connectionStatus === 'Connected';
   const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const moveIntervalRef = useRef(null);
@@ -36,6 +40,39 @@ export default function MovementScreen() {
     }, [])
   );
 
+  const joystickMovingRef = useRef(false);
+
+  function timestamp() {
+    return new Date().toTimeString().slice(0, 8);
+  }
+
+  function makeHistoryId() {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  }
+
+  function sessionHistoryStorageKey(username) {
+    return `sessionHistory_${username}`;
+  }
+
+  const appendSessionEntry = useCallback(async (label, success = true) => {
+    try {
+      if (!username || !connectionId) return;
+      const key = sessionHistoryStorageKey(username);
+      const stored = await AsyncStorage.getItem(key);
+      let parsed = null;
+      if (stored) parsed = JSON.parse(stored);
+      // If stored exists but belongs to another connection, replace it with current connection
+      if (!parsed || parsed.connectionId !== connectionId) {
+        parsed = { connectionId, history: [] };
+      }
+      const entry = { id: makeHistoryId(), label, success, time: timestamp() };
+      parsed.history = [entry, ...(parsed.history || [])].slice(0, 100);
+      await AsyncStorage.setItem(key, JSON.stringify(parsed));
+    } catch (err) {
+      console.error('[MovementScreen] appendSessionEntry error', err);
+    }
+  }, [username, connectionId]);
+
   const showFeedback = (message, success) => {
     setFeedback({ message, success, key: Date.now() });
   };
@@ -43,6 +80,9 @@ export default function MovementScreen() {
   const startDirectionalMove = (vx, vy, vyaw) => {
     if (!isConnected) return;
     robotService.move(vx, vy, vyaw).catch(console.error);
+    // record directional start once per press
+    const label = vx > 0 ? 'Mover: Adelante' : vx < 0 ? 'Mover: Atrás' : vyaw > 0 ? 'Giro: Izquierda' : 'Giro: Derecha';
+    appendSessionEntry(label, true);
     moveIntervalRef.current = setInterval(() => {
       if (!isConnectedRef.current) return;
       robotService.move(vx, vy, vyaw).catch(console.error);
@@ -54,25 +94,39 @@ export default function MovementScreen() {
     moveIntervalRef.current = null;
     if (!isConnectedRef.current) return;
     robotService.stop().catch(console.error);
+    appendSessionEntry('Stop', true);
   };
 
   const handleAction = async (action, label) => {
     try {
       await action();
       showFeedback(`${label}: OK`, true);
+      appendSessionEntry(label, true);
     } catch (e) {
       showFeedback(e.response?.data?.detail ?? `Error: ${label}`, false);
+      appendSessionEntry(`${label} (error)`, false);
     }
   };
 
   const handleJoystickMove = (vx, vy, vyaw) => {
     if (!isConnectedRef.current) return;
     robotService.move(vx, vy, vyaw).catch(console.error);
+    // only record start of joystick movement
+    const moving = Math.abs(vx) > 0.01 || Math.abs(vyaw) > 0.01 || Math.abs(vy) > 0.01;
+    if (moving && !joystickMovingRef.current) {
+      joystickMovingRef.current = true;
+      const label = `Joystick: vx=${vx.toFixed(2)} vy=${vy.toFixed(2)} vyaw=${vyaw.toFixed(2)}`;
+      appendSessionEntry(label, true);
+    }
   };
 
   const handleJoystickStop = () => {
     if (!isConnectedRef.current) return;
     robotService.stop().catch(console.error);
+    if (joystickMovingRef.current) {
+      joystickMovingRef.current = false;
+      appendSessionEntry('Joystick: stop', true);
+    }
   };
 
   return (

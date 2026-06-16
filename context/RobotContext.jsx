@@ -12,6 +12,7 @@ export function RobotProvider({ children }) {
   const [name, setName] = useState(null);
   const [networkInterface, setNetworkInterface] = useState(null);
   const [statusData, setStatusData] = useState(null);
+  const [connectionId, setConnectionId] = useState(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const reconnectTimerRef = useRef(null);
@@ -42,18 +43,22 @@ export function RobotProvider({ children }) {
     }
   }, []);
 
+  const generateConnectionId = useCallback(() => `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, []);
+
   const setConnectedState = useCallback((iface, data) => {
     isReconnectingRef.current = false;
     setReconnectAttempts(0);
     setIsConnected('Connected');
     setNetworkInterface(iface || null);
     setStatusData(data || null);
-  }, []);
+    setConnectionId(prev => prev ?? generateConnectionId());
+  }, [generateConnectionId]);
 
   const setErrorState = useCallback(() => {
     isReconnectingRef.current = false;
     setIsConnected('Error');
     setNetworkInterface(null);
+    setConnectionId(null);
   }, []);
 
   const setReconnectingState = useCallback(() => {
@@ -91,6 +96,7 @@ export function RobotProvider({ children }) {
     setReconnectAttempts(0);
     setStatusData(null);
     setName(null);
+    setConnectionId(null);
     setIsConnected('Disconnected');
     setNetworkInterface(null);
   }, [clearHeartbeatTimer, clearReconnectTimer]);
@@ -117,6 +123,7 @@ export function RobotProvider({ children }) {
     setStatusData(null);
     try {
       await connectionService.disconnect();
+      setConnectionId(null);
       setIsConnected('Disconnected');
       setNetworkInterface(null);
     } catch (error) {
@@ -131,6 +138,7 @@ export function RobotProvider({ children }) {
         setConnectedState(data.network_interface, data);
         if (data.robot_type) setName(data.robot_type);
       } else {
+        setConnectionId(null);
         setIsConnected('Disconnected');
       }
     } catch {
@@ -181,6 +189,7 @@ export function RobotProvider({ children }) {
     isConnected,
     name,
     robotType: name,
+    connectionId,
     networkInterface,
     statusData,
     reconnectAttempts,
@@ -189,7 +198,7 @@ export function RobotProvider({ children }) {
     connectRobot,
     disconnectRobot,
     refreshStatus,
-  }), [isConnected, name, networkInterface, statusData, reconnectAttempts, selectRobot, deselectRobot, connectRobot, disconnectRobot, refreshStatus]);
+  }), [isConnected, name, connectionId, networkInterface, statusData, reconnectAttempts, selectRobot, deselectRobot, connectRobot, disconnectRobot, refreshStatus]);
 
   return (
     <RobotContext.Provider value={value}>

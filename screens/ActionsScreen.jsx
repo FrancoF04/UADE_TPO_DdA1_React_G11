@@ -1,13 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRobot } from '@/context/RobotContext';
+import { useAuth } from '@/context/AuthContext';
 import { actionsService, TOGGLE_ENDPOINTS } from '@/services/actionsService';
 import ActionButton from '@/components/ActionButton/ActionButton';
 import ToggleButton from '@/components/ToggleButton/ToggleButton';
 import FeedbackToast from '@/components/FeedbackToast/FeedbackToast';
 import ConnectionBanner from '@/components/ConnectionBanner/ConnectionBanner';
 import styles from './ActionsScreen.styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ROBOT_LABELS = {
   go2: 'Go2 (cuadrúpedo)',
@@ -24,8 +26,23 @@ function timestamp() {
   return new Date().toTimeString().slice(0, 8);
 }
 
+function makeHistoryId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+//guardar historial pasado por usuario
+function historyStorageKey(username) {
+  return `pastHistory_${username}`;
+}
+
+function sessionHistoryStorageKey(username) {
+  return `sessionHistory_${username}`;
+}
+
 export default function ActionsScreen() {
-  const { isConnected, robotType } = useRobot();
+  const { isConnected, robotType, connectionId } = useRobot();
+  const { user } = useAuth();
+  const username = user?.username ?? null;
   const isActive = isConnected === 'Connected';
 
   const [actions, setActions] = useState([]);
@@ -33,6 +50,36 @@ export default function ActionsScreen() {
   const [toggleStates, setToggleStates] = useState({});
   const [feedback, setFeedback] = useState({ message: null, success: false, key: 0 });
   const [history, setHistory] = useState([]);
+  const [pastHistory, setPastHistory] = useState([]);
+  const [sessionHistoryLoaded, setSessionHistoryLoaded] = useState(false);
+  const [pastHistoryLoaded, setPastHistoryLoaded] = useState(false);
+  const historyRef = useRef(history);
+  const usernameRef = useRef(username);
+  const prevIsConnectedRef = useRef(isConnected);
+
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+
+  useEffect(() => {
+    usernameRef.current = username;
+  }, [username]);
+
+  // Flush current session history only when the robot truly disconnects or errors out.
+  useEffect(() => {
+    const prev = prevIsConnectedRef.current;
+    const isDisconnectState = isConnected === 'Disconnected' || isConnected === 'Error';
+
+    if (prev === 'Connected' && isDisconnectState) {
+      flushCurrentSessionHistory();
+    }
+
+    if (isConnected === 'Connected' && prev !== 'Connected') {
+      setHistory([]);
+    }
+
+    prevIsConnectedRef.current = isConnected;
+  }, [isConnected, flushCurrentSessionHistory]);
 
   const robotTypeLower = robotType?.toLowerCase();
 
@@ -46,7 +93,7 @@ export default function ActionsScreen() {
 
   const addToHistory = (label, success) => {
     setHistory(prev =>
-      [{ id: Date.now(), label, success, time: timestamp() }, ...prev].slice(0, 30)
+      [{ id: makeHistoryId(), label, success, time: timestamp() }, ...prev].slice(0, 30)
     );
   };
 
@@ -67,8 +114,139 @@ export default function ActionsScreen() {
     useCallback(() => {
       loadActions();
       setToggleStates({});
-    }, [loadActions])
+      loadSessionHistory();
+      loadPastHistory();
+    }, [loadActions, loadSessionHistory, loadPastHistory])
   );
+
+  const loadSessionHistory = useCallback(async () => {
+    if (!username) {
+      setHistory([]);
+      setSessionHistoryLoaded(true);
+      return;
+    }
+
+    if (!isActive) {
+      try {
+        await flushStoredSessionHistory();
+      } catch (error) {
+        console.error('Error flushing stored session history before load:', error);
+      } finally {
+        setHistory([]);
+        setSessionHistoryLoaded(true);
+      }
+      return;
+    }
+
+    try {
+      const stored = await AsyncStorage.getItem(sessionHistoryStorageKey(username));
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.connectionId !== connectionId) {
+          await flushStoredSessionHistory();
+          setHistory([]);
+        } else {
+          setHistory(parsed.history ?? []);
+        }
+      } else {
+        setHistory([]);
+      }
+    } catch (error) {
+      console.error('Error loading session history:', error);
+      setHistory([]);
+    } finally {
+      setSessionHistoryLoaded(true);
+    }
+  }, [username, isActive, flushStoredSessionHistory]);
+
+  const loadPastHistory = useCallback(async () => {
+    if (!username) return;
+    try {
+      const stored = await AsyncStorage.getItem(historyStorageKey(username));
+      if (stored) {
+        setPastHistory(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error('Error loading past history:', error);
+    } finally {
+      setPastHistoryLoaded(true);
+    }
+  }, [username]);
+
+  const savePastHistory = useCallback(async (newHistory) => {
+    if (!username) return;
+    try {
+      await AsyncStorage.setItem(historyStorageKey(username), JSON.stringify(newHistory));
+    } catch (error) {
+      console.error('Error saving past history:', error);
+    }
+  }, [username]);
+
+  const saveSessionHistory = useCallback(async (newHistory) => {
+    if (!username || !connectionId) return;
+    try {
+      await AsyncStorage.setItem(
+        sessionHistoryStorageKey(username),
+        JSON.stringify({ connectionId, history: newHistory })
+      );
+    } catch (error) {
+      console.error('Error saving session history:', error);
+    }
+  }, [username, connectionId]);
+
+  const flushStoredSessionHistory = useCallback(async () => {
+    if (!username) return;
+
+    try {
+      const storedSession = await AsyncStorage.getItem(sessionHistoryStorageKey(username));
+      if (!storedSession) return;
+
+      const sessionData = JSON.parse(storedSession);
+      const sessionItems = Array.isArray(sessionData?.history) ? sessionData.history : [];
+      const storedPast = await AsyncStorage.getItem(historyStorageKey(username));
+      const pastData = storedPast ? JSON.parse(storedPast) : [];
+      const combined = [...sessionItems, ...pastData].slice(0, 100);
+      await AsyncStorage.setItem(historyStorageKey(username), JSON.stringify(combined));
+      await AsyncStorage.removeItem(sessionHistoryStorageKey(username));
+      setPastHistory(combined);
+      setHistory([]);
+    } catch (error) {
+      console.error('Error flushing stored session history:', error);
+    }
+  }, [username]);
+
+  const flushCurrentSessionHistory = useCallback(async () => {
+    const currentUsername = usernameRef.current;
+    const currentHistory = historyRef.current;
+    if (!currentUsername || currentHistory.length === 0) return;
+
+    try {
+      const stored = await AsyncStorage.getItem(historyStorageKey(currentUsername));
+      const existingHistory = stored ? JSON.parse(stored) : [];
+      const combined = [...currentHistory, ...existingHistory].slice(0, 100);
+      await AsyncStorage.setItem(historyStorageKey(currentUsername), JSON.stringify(combined));
+      await AsyncStorage.removeItem(sessionHistoryStorageKey(currentUsername));
+      setPastHistory(combined);
+      setHistory([]);
+    } catch (error) {
+      console.error('Error flushing session history:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPastHistory();
+    loadSessionHistory();
+  }, [loadPastHistory, loadSessionHistory]);
+
+  useEffect(() => {
+    if (!pastHistoryLoaded) return;
+    savePastHistory(pastHistory);
+  }, [pastHistory, savePastHistory]);
+
+  useEffect(() => {
+    if (!sessionHistoryLoaded) return;
+    saveSessionHistory(history);
+  }, [history, saveSessionHistory, sessionHistoryLoaded]);
 
   const handleExecuteAction = async (name) => {
     try {
@@ -162,14 +340,32 @@ export default function ActionsScreen() {
           </View>
         )}
 
-        {/* History */}
+        {/* Historial acciones sesion actual */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Historial de sesión</Text>
+          <Text style={styles.sectionTitle}>Historial de sesión actual</Text>
           {history.length === 0 ? (
             <Text style={styles.emptyHistory}>Sin acciones ejecutadas aún.</Text>
           ) : (
             <View style={styles.historyList}>
               {history.map(item => (
+                <View key={item.id} style={styles.historyItem}>
+                  <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
+                  <Text style={styles.historyText}>{item.label}</Text>
+                  <Text style={styles.historyTime}>{item.time}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Historial de acciones sesiones anteriores */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Historial de sesiones pasadas</Text>
+          {pastHistory.length === 0 ? (
+            <Text style={styles.emptyHistory}>Sin acciones de sesiones pasadas.</Text>
+          ) : (
+            <View style={styles.historyList}>
+              {pastHistory.map(item => (
                 <View key={item.id} style={styles.historyItem}>
                   <View style={[styles.historyDot, item.success ? styles.historyDotOk : styles.historyDotErr]} />
                   <Text style={styles.historyText}>{item.label}</Text>

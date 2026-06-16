@@ -82,7 +82,7 @@ export default StyleSheet.create({
   },
   historyTime: {
     fontSize: 11,
-    color: COLORS.disabled,
+    color: COLORS.white,
   },
   emptyHistory: {
     ...TEXT.subtitle,
