@@ -14,8 +14,7 @@ export const api = axios.create({
 api.interceptors.request.use(async (config) => {
   const token = await getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
-  const body = config.data ? ` | body: ${JSON.stringify(config.data)}` : '';
-  console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}${body}`);
+  if (__DEV__) console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
   return config;
 });
 
