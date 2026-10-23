@@ -173,3 +173,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Documentación interna / material de la cátedra y contexto de agentes de IA (no se publica)
+docs/
+CLAUDE.md
+AGENTS.md
+commits.md
